@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import Boton from "./ComponentesExternos/Boton"; // Asegúrate de importar el componente Button
+import Boton from "./ComponentesExternos/Boton"; 
 
 const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
   const navigate = useNavigate();

@@ -1,12 +1,13 @@
-"use client"
-
+import { Link, useNavigate } from "react-router-dom"
 import { useState, useEffect, useRef } from "react"
 
-export default function Navbar() {
+export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [user, setUser] = useState(null)
     const searchInputRef = useRef(null)
     const menuRef = useRef(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -24,14 +25,28 @@ export default function Navbar() {
         }
     }, [])
 
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user"))
+        if (storedUser) {
+            setUser(storedUser)
+        }
+    }, [])
+
+    const handleLogout = () => {
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        setUser(null)
+        navigate("/")
+    }
+
     return (
         <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-[#778899] to-transparent dark:from-black dark:to-transparent">
             <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6">
 
                 {/* Logo */}
-                <a href="/" className="text-2xl font-bold text-white hover:text-[var(--principal)]">
+                <Link to="/" className="text-2xl font-bold text-white hover:text-[var(--principal)]">
                     CineLuxe
-                </a>
+                </Link>
 
                 {/* MENU RESPONSIVE */}
                 <nav
@@ -52,14 +67,29 @@ export default function Navbar() {
                         </a>
                     ))}
 
-                    {/* Login dentro del menú */}
-                    <a href="/login" className="text-white hover:text-[var(--principal)] py-2 px-4 lg:hidden">
-                        Login
-                    </a>
-
-                    <a href="/register" className="text-white hover:text-[var(--principal)] py-2 px-4 lg:hidden">
-                        Registro
-                    </a>
+                    {/* Usuario en menú móvil */}
+                    <div className="flex flex-col items-center lg:hidden">
+                        {user ? (
+                            <>
+                                <p className="text-white py-2 px-4"><span className="font-semibold text-[var(--principal)]">{user.name}</span></p>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-white hover:text-[var(--principal)] py-2 px-4 transition-all"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className="text-white hover:text-[var(--principal)] py-2 px-4">
+                                    Iniciar Sesión
+                                </Link>
+                                <Link to="/register" className="text-white hover:text-[var(--principal)] py-2 px-4">
+                                    Registro
+                                </Link>
+                            </>
+                        )}
+                    </div>
                 </nav>
 
                 {/* Barra de búsqueda y Login en escritorio */}
@@ -71,7 +101,6 @@ export default function Navbar() {
                             className="p-2 text-white hover:text-[var(--principal)] transition-all duration-300"
                             aria-label="Alternar búsqueda"
                         >
-
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-5 w-5"
@@ -97,12 +126,28 @@ export default function Navbar() {
                     </div>
 
                     {/* Login en escritorio */}
-                    <a href="/login" className="hidden lg:inline-block text-white hover:text-[var(--principal)]">
-                        Iniciar Sesión
-                    </a>
-                    <a href="/register" className="hidden lg:inline-block text-white hover:text-[var(--principal)]">
-                        Registro
-                    </a>
+                    <div className="hidden lg:flex items-center space-x-4">
+                        {user ? (
+                            <>
+                                <p className="text-white mb-0"><span className="font-semibold text-[var(--principal)]">{user.name}</span></p>
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-white hover:text-[var(--principal)] transition-all"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className="text-white hover:text-[var(--principal)]">
+                                    Iniciar Sesión
+                                </Link>
+                                <Link to="/register" className="text-white hover:text-[var(--principal)]">
+                                    Registro
+                                </Link>
+                            </>
+                        )}
+                    </div>
 
 
                     {/* Botón para alternar el menú móvil */}
