@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-
-const ImageCarousel = ({ images, interval = 200000000000 }) => { // Cambié el valor del intervalo a 20000ms (20 segundos)
+const ImageCarousel = ({ images, interval = 2 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Para habilitar el deslizamiento táctil
   const handleSwipe = (direction) => {
     if (direction === 'left') {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -27,11 +25,11 @@ const ImageCarousel = ({ images, interval = 200000000000 }) => { // Cambié el v
 
   return (
     <div
-      className="relative w-full h-[300px] sm:h-[200px] md:h-[300px] lg:h-[400px] xl:h-[500px] overflow-hidden"
+      className="relative w-full  md:h-[500px] overflow-hidden"
       onTouchStart={(e) => (this.touchStart = e.touches[0].clientX)}
       onTouchEnd={(e) => {
-        if (this.touchStart - e.changedTouches[0].clientX > 50) handleSwipe('left'); 
-        if (this.touchStart - e.changedTouches[0].clientX < -50) handleSwipe('right'); 
+        if (this.touchStart - e.changedTouches[0].clientX > 50) handleSwipe('left');
+        if (this.touchStart - e.changedTouches[0].clientX < -50) handleSwipe('right');
       }}
     >
       <div
@@ -39,17 +37,30 @@ const ImageCarousel = ({ images, interval = 200000000000 }) => { // Cambié el v
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {images.map((image, index) => (
-          <div key={index} className="w-full flex-shrink-0">
-            <img
-              src={image}
-              alt={`slide-${index}`}
-              className="w-full h-full object-cover"
-            />
+          <div key={index} className="w-full flex-shrink-0 relative overflow-hidden">
+            {/* Gradiente en el fondo, solo visible en pantallas pequeñas */}
+            <div className="absolute inset-0 -z-80 blur-[40px]" style={{
+              backgroundImage: `url(${image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }} />
+
+            {/* Gradiente sobre el fondo desenfocado */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/50 -z-10" />
+
+            {/* Imagen sobre el gradiente */}
+            <div className="relative w-full flex justify-center items-center z-10 ">
+              <img
+                src={image}
+                alt="Banner"
+                className="w-auto h-full md:h-[500px] object-cover"
+              />
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Puntos de paginación, solo en pantallas grandes */}
+      {/* Indicadores del carrusel (solo visibles en pantallas medianas y grandes) */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10 hidden sm:flex">
         {images.map((_, index) => (
           <div

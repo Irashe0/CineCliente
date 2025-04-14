@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&display=swap');
 
 :root {
-  --principal: #FFD700;
+  --principal: #CDAA7D;
   --blanco-traslúcido: #F8F8FF;
   --gris-pizarra-claro: #778899;
   --lavanda-suave: #EDEDFF;
@@ -40,7 +40,7 @@
 
 body {
   font-family: 'Open Sans', sans-serif;
-  background-color: var(--lavanda-suave);
+  background-color: var(--texto-oscuro);
   color: rgb(var(--foreground-rgb));
   line-height: 1.6;
   margin: 0;
@@ -59,7 +59,6 @@ h1, h2, h3, h4, h5, h6 {
 p, span, li {
   font-family: 'Open Sans', 'Roboto', sans-serif;
   font-size: 1rem;
-  color: var(--gris-pizarra-claro);
   margin-bottom: 1rem;
 }
 
@@ -117,9 +116,7 @@ section, article, header {
   body {
     background-color: var(--fondo-oscuro);
   }
-  p, span, li {
-    color: var(--gris-pizarra-claro);
-  }
+
   h1, h2, h3, h4, h5, h6 {
     color: var(--texto-claro);
   }
