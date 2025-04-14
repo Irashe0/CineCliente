@@ -1,21 +1,20 @@
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import Boton from "./ComponentesExternos/Boton"; 
+import Boton from "./ComponentesExternos/Boton";
 
 const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative group overflow-hidden rounded-md shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 w-48 hover:border-2 border-[#FFD700]">
+    <div className="relative inline-block overflow-hidden rounded-md shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:border-2 border-[#FFD700] max-w-[600px] max-h-[500px]">
       <img
-        className="w-full h-60 object-cover"
-        src={posterUrl || "./assets/placeholder.svg"}
+        className="w-full h-auto object-contain"
+        src={posterUrl || "./assets/placeholder.jpg"}
         alt={`${title} poster`}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#2D2D2D] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-
+      <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ">
         <div className="absolute top-0 left-0 right-0 p-4 text-white text-sm text-center">
-          <h3 className="text-lg font-bold">{title}</h3>
+          <h1 className="text-lg font-bold">{title}</h1>
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm">
           <div className="flex flex-col space-y-2 mt-16">
@@ -28,6 +27,8 @@ const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
         </div>
       </div>
     </div>
+
+
   );
 };
 

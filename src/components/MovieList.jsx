@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MovieCard from "./MovieCard";
-import imagen from "../assets/PlaceHolder.webp";
+import imagen from "../assets/169917.avif";
 import trailer from "../assets/Rick Astley - Never Gonna Give You Up (Official Music Video).mp4"
 
 const MovieList = () => {
@@ -8,7 +8,9 @@ const MovieList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/peliculas")
+    fetch("https://laravelcine-cine-zeocca.laravel.cloud/api/peliculas", {
+      method: "GET"
+    })
       .then((response) => response.json())
       .then((data) => {
         setMovies(data);

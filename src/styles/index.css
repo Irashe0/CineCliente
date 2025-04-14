@@ -98,7 +98,7 @@ input:focus, textarea:focus, select:focus {
   border-color: var(--principal);
 }
 
-section, article, header, footer {
+section, article, header {
   padding: 2rem;
   margin-bottom: 2rem;
 }
