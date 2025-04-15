@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap');
 
 :root {
   --principal: #CDAA7D;
@@ -39,7 +39,7 @@
 }
 
 body {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Playfair Display', serif;
   background-color: var(--texto-oscuro);
   color: rgb(var(--foreground-rgb));
   line-height: 1.6;
@@ -51,13 +51,11 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   color: var(--texto-oscuro);
 }
 
 p, span, li {
-  font-family: 'Open Sans', 'Roboto', sans-serif;
   font-size: 1rem;
   margin-bottom: 1rem;
 }
@@ -76,7 +74,6 @@ button {
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   transition: background-color 0.3s ease;
 }
@@ -89,7 +86,6 @@ input, textarea, select {
   padding: 0.75rem;
   border-radius: 0.375rem;
   border: 1px solid var(--gris-pizarra-claro);
-  font-family: 'Open Sans', 'Roboto', sans-serif;
 }
 
 input:focus, textarea:focus, select:focus {

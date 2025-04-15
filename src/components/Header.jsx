@@ -40,7 +40,7 @@ export default function Header() {
     }
 
     return (
-        <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-[#778899] to-transparent dark:from-black dark:to-transparent text-white shadow-[rgba(0,0,0,0.25)]">
+        <header className="fixed top-0 left-0 w-full text-lg z-50 bg-gradient-to-b from-[#778899] to-transparent dark:from-black dark:to-transparent text-white shadow-[rgba(0,0,0,0.25)]">
             <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6">
                 <Link to="/" className="text-2xl font-bold text-[#CDAA7D] hover:text-[#CDAA7D]">
                     CineLuxe
@@ -59,7 +59,10 @@ export default function Header() {
                     <div className="flex flex-col items-center lg:hidden">
                         {user ? (
                             <>
-                                <p className="py-2 px-4"><span className="font-semibold text-[#CDAA7D]">{user.name}</span></p>
+                                <Link to={`/perfil/${user.id}`} className="mb-0 font-semibold text-lg text-[#CDAA7D]">
+                                    {user.name}
+                                </Link>
+
                                 <button onClick={handleLogout} className=" text-white hover:text-[#CDAA7D] py-2 px-4 transition-all">
                                     Cerrar sesión
                                 </button>
@@ -80,12 +83,15 @@ export default function Header() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </button>
-                        <input type="text" placeholder="Buscar películas..." className={`absolute top-1 right-0 -translate-y-[30%] mt-2 px-2 py-1 text-sm border border-[#CDAA7D] rounded-md shadow-md focus:outline-none focus:ring focus:border-[#CDAA7D] transition-all duration-500 ease-in-out bg-black text-white ${isSearchOpen ? "w-48 sm:w-72 opacity-100" : "w-0 opacity-0"}`} />
+                        <input type="text" placeholder="Buscar películas..." className={`absolute top-1 right-9 -translate-y-[30%] mt-2 px-2 py-1 text-sm border border-[#CDAA7D] rounded-md shadow-md focus:outline-none focus:ring focus:border-[#CDAA7D] transition-all duration-500 ease-in-out bg-black text-white ${isSearchOpen ? "w-20 sm:w-80 opacity-100" : "w-0 opacity-0"}`} />
                     </div>
                     <div className="hidden lg:flex items-center space-x-4">
                         {user ? (
                             <>
-                                <p className="mb-0"><span className="font-semibold text-[#CDAA7D]">{user.name}</span></p>
+                                <Link to={`/perfil/${user.id}`} className="mb-0 font-semibold text-lg text-[#CDAA7D]">
+                                    {user.name}
+                                </Link>
+
                                 <button onClick={handleLogout} className="text-white  hover:text-[#CDAA7D] transition-all">Cerrar sesión</button>
                             </>
                         ) : (

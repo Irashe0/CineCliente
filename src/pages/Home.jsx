@@ -19,7 +19,7 @@ function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowButton(window.scrollY > 200); // Mostrar el botón cuando bajes 200px
+      setShowButton(window.scrollY > 200); 
     };
 
     window.addEventListener("scroll", handleScroll);

@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import Boton from "../components/ComponentesExternos/Boton"
 
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
 
   const API_URL = import.meta.env.VITE_API_URL || "https://laravelcine-cine-zeocca.laravel.cloud/api"
@@ -39,9 +39,6 @@ export default function Login() {
       const userData = await userResponse.json()
       localStorage.setItem("user", JSON.stringify({ name: userData.name }))
 
-      if (rememberMe) {
-        localStorage.setItem("rememberMe", JSON.stringify({ email, password }))
-      }
 
       navigate("/")
 
@@ -51,7 +48,14 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#16213E] p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
+
+      <div className="absolute top-6 left-0 right-0 text-center">
+        <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
+          CineLuxe
+        </Link>
+      </div>
+
       <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] border-opacity-50">
         <div className="bg-gradient-to-t from-[#0F0F0F] to-[#1E1E1E] p-6 flex flex-col items-center">
           <h2 className="text-2xl font-serif text-center font-bold text-[#E0E0E0] mb-3">
@@ -81,32 +85,16 @@ export default function Login() {
                 <label htmlFor="password" className="block text-sm font-medium text-[#E0E0E0]">
                   Contraseña
                 </label>
-                <a href="/forgot-password" className="text-sm text-[#CDAA7D] hover:text-[#A68256]">
-                  ¿Olvidaste tu contraseña?
-                </a>
               </div>
               <input
                 id="password"
                 type="password"
-                placeholder="********"
+                placeholder="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full rounded border border-gray-600 bg-[#232323] text-white p-2 focus:border-[#CDAA7D] focus:ring-1 focus:ring-[#CDAA7D]"
               />
-            </div>
-
-            <div className="flex items-center mb-4">
-              <input
-                id="remember"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-[#CDAA7D] focus:ring-[#CDAA7D]"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <label htmlFor="remember" className="ml-2 text-sm text-[#E0E0E0]">
-                Recordar sesión
-              </label>
             </div>
 
             <div className="w-full flex justify-center">
