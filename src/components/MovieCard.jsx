@@ -26,7 +26,7 @@ const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
       <div className="absolute inset-0 flex flex-col justify-end items-center p-4 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex flex-col space-y-2 w-full">
           <Boton className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md">
-            Comprar
+            Tickets
           </Boton>
           <Boton className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md" onClick={() => window.open(trailerUrl, "_blank")} disabled={!trailerUrl}>
             {trailerUrl ? "Tráiler" : "No Tráiler"}

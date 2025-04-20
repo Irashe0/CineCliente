@@ -4,13 +4,14 @@ import { Clock } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Boton from "../components/ComponentesExternos/Boton";
-import imagen from "../assets/PlaceHolder.webp";
-import banner from "../assets/Banner1.jpg";
+import imagen from "../assets/PlaceHolder.webp"; 
+import banner from "../assets/Banner1.jpg"; 
 
 export default function MovieDetails() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [multimedia, setMultimedia] = useState(null); 
 
   useEffect(() => {
     fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/peliculas/${id}`)
@@ -23,10 +24,24 @@ export default function MovieDetails() {
         console.error("Error al obtener detalles:", err);
         setLoading(false);
       });
+
+    fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/multimedia?id_pelicula=${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMultimedia(data); 
+      })
+      .catch((err) => {
+        console.error("Error al obtener multimedia:", err);
+      });
   }, [id]);
 
   if (loading) return <div className="text-white text-center py-10">Cargando...</div>;
   if (!movie) return <div className="text-white text-center py-10">Película no encontrada.</div>;
+
+  const movieMultimedia = multimedia?.filter(m => m.id_pelicula === parseInt(id));
+
+  const movieBanner = movieMultimedia?.find(m => m.banner)?.banner || banner;
+  const moviePoster = movieMultimedia?.find(m => m.portada)?.portada || imagen;
 
   return (
     <>
@@ -36,7 +51,7 @@ export default function MovieDetails() {
         <div className="relative w-full h-[50vh] md:h-[60vh]">
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10 pointer-events-none" />
           <img
-            src={banner}
+            src={movieBanner}
             alt={`Banner de ${movie.titulo}`}
             className="absolute inset-0 w-full h-full object-cover z-0]"
           />
@@ -44,7 +59,6 @@ export default function MovieDetails() {
             <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-wide text-[var(--principal)]">
               {movie.titulo}
             </h1>
-
           </div>
         </div>
 
@@ -54,7 +68,7 @@ export default function MovieDetails() {
           <div className="md:col-span-1 flex justify-center">
             <div className="aspect-[2/3] w-full max-w-[300px] rounded-md bg-neutral-800 overflow-hidden">
               <img
-                src={imagen}
+                src={moviePoster}
                 alt={`Póster de ${movie.titulo}`}
                 className="w-full h-full object-cover"
               />

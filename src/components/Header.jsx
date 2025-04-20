@@ -94,7 +94,7 @@ const Header = () => {
               Cines
             </Link>
             <Link
-              to="/cartelera"
+              to="/"
               className="text-white hover:text-[var(--principal)] transition-colors"
             >
               Cartelera

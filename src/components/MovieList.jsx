@@ -44,11 +44,11 @@ export default function ListadoPeliculas() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 p-4 justify-items-center">
       {peliculas.map((peli) => (
         <MovieCard
-          key={peli.id || peli.titulo} // Asegurar una `key` única
-          id={peli.id}
+          key={peli.id_pelicula || peli.titulo} 
+          id={peli.id_pelicula}
           title={peli.titulo}
           rating={peli.rating || "N/A"}
           posterUrl={peli.posterUrl}
@@ -57,4 +57,5 @@ export default function ListadoPeliculas() {
       ))}
     </div>
   );
+  
 }
