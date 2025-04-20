@@ -19,14 +19,14 @@ const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
 
       <div className="bottom-0 left-0 right-0 p-4 text-[#E0E0E0] text-center transition-transform duration-1000 group-hover:-translate-y-[250px]">
         <h1 className="text-3xl font-bold drop-shadow-[2px_2px_4px_rgba(0,0,0,0.8)] group-hover:text-[#CDAA7D]">
-          {title}
+          {title.length > 20 ? `${title.slice(0, 25)}...` : title}
         </h1>
       </div>
 
       <div className="absolute inset-0 flex flex-col justify-end items-center p-4 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="flex flex-col space-y-2 w-full">
-          <Boton className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md" onClick={() => navigate(`/horarios/${id}`)}>
-            Horarios
+          <Boton className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md">
+            Comprar
           </Boton>
           <Boton className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md" onClick={() => window.open(trailerUrl, "_blank")} disabled={!trailerUrl}>
             {trailerUrl ? "Tráiler" : "No Tráiler"}
