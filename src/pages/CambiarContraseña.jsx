@@ -78,7 +78,6 @@ export default function CambiarContraseña() {
           <div className="h-px w-24 mx-auto bg-gradient-to-r from-transparent via-[#CDAA7D] to-transparent mb-4"></div>
 
           <form onSubmit={handleSubmit} className="w-full">
-            {/* ✅ Input: Contraseña actual */}
             <div className="mb-4">
               <label htmlFor="currentPassword" className="block text-sm font-medium text-[#E0E0E0]">
                 Contraseña actual
@@ -92,8 +91,6 @@ export default function CambiarContraseña() {
                 className="w-full rounded border border-gray-600 bg-[#232323] text-white p-2 focus:border-[#CDAA7D] focus:ring-1 focus:ring-[#CDAA7D]"
               />
             </div>
-
-            {/* ✅ Input: Nueva contraseña */}
             <div className="mb-4">
               <label htmlFor="newPassword" className="block text-sm font-medium text-[#E0E0E0]">
                 Nueva contraseña
@@ -107,8 +104,6 @@ export default function CambiarContraseña() {
                 className="w-full rounded border border-gray-600 bg-[#232323] text-white p-2 focus:border-[#CDAA7D] focus:ring-1 focus:ring-[#CDAA7D]"
               />
             </div>
-
-            {/* ✅ Input: Confirmar nueva contraseña */}
             <div className="mb-4">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#E0E0E0]">
                 Confirmar nueva contraseña

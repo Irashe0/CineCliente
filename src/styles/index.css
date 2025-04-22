@@ -39,7 +39,8 @@
 }
 
 body {
-  font-family: 'Playfair Display', serif;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 1.2rem;
   background-color: var(--texto-oscuro);
   color: rgb(var(--foreground-rgb));
   line-height: 1.6;

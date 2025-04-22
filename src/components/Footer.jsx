@@ -17,7 +17,7 @@ const Footer = () => {
           <div>
             <h4 className="text-md font-semibold mb-2 text-left">Información Adicional</h4>
             <ul className="text-xs space-y-1 text-left">
-              <li><a href="#" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">Sobre Nosotros</a></li>
+              <li><a href="/SobreNosotros" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">Sobre Nosotros</a></li>
               <li><a href="#" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">FAQs</a></li>
               <br />
               <li><a href="#" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">Cines</a></li>

@@ -146,9 +146,8 @@ const Header = () => {
       </header>
 
       <div
-        className={`absolute left-0 top-16 w-full transition-all duration-300 overflow-hidden z-10 ${
-          isSearchOpen ? "max-h-[500px] py-4" : "max-h-0"
-        }`}
+        className={`absolute left-0 top-16 w-full transition-all duration-300 overflow-hidden z-10 ${isSearchOpen ? "max-h-[500px] py-4" : "max-h-0"
+          }`}
       >
         <div className="container mx-auto px-4">
           <input
@@ -171,7 +170,7 @@ const Header = () => {
                     key={movie.id}
                     className="p-3 hover:bg-[var(--principal)] transition-colors"
                   >
-                    <Link to={`/pelicula/${movie.id}`} className="block">
+                    <Link to={`/peliculas/${movie.id_pelicula}`} className="block">
                       <span className="font-medium text-[var(--texto-claro)]">{movie.titulo}</span>
                     </Link>
                   </li>

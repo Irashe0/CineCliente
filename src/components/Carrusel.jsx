@@ -1,77 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import ImageCarousel from './ImagenesCarrusel'; 
 
-const ImageCarousel = ({ images, interval = 2 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleSwipe = (direction) => {
-    if (direction === 'left') {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    } else if (direction === 'right') {
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-    }
-  };
+const BannerCarousel = () => {
+  const [banners, setBanners] = useState([]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, interval);
+    fetch('https://laravelcine-cine-zeocca.laravel.cloud/api/multimedia')
+      .then((res) => res.json())
+      .then((data) => {
+        const bannerImages = data.filter(item => item.banner).slice(5, 10).map(item => item.banner);
+        setBanners(bannerImages);
+      })
+      .catch((err) => {
+        console.error("Error al obtener los banners:", err);
+      });
+  }, []);
 
-    return () => clearInterval(timer);
-  }, [images.length, interval]);
+  if (banners.length === 0) {
+    return <div className="text-white text-center py-10">Cargando banners...</div>;
+  }
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
-  };
-
-  return (
-    <div
-      className="relative w-full  md:h-[500px] overflow-hidden"
-      onTouchStart={(e) => (this.touchStart = e.touches[0].clientX)}
-      onTouchEnd={(e) => {
-        if (this.touchStart - e.changedTouches[0].clientX > 50) handleSwipe('left');
-        if (this.touchStart - e.changedTouches[0].clientX < -50) handleSwipe('right');
-      }}
-    >
-      <div
-        className="flex transition-all ease-in-out duration-1000"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
-        {images.map((image, index) => (
-          <div key={index} className="w-full flex-shrink-0 relative overflow-hidden">
-            {/* Gradiente en el fondo, solo visible en pantallas pequeñas */}
-            <div className="absolute inset-0 -z-80 blur-[40px]" style={{
-              backgroundImage: `url(${image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }} />
-
-            {/* Gradiente sobre el fondo desenfocado */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/50 -z-10" />
-
-            {/* Imagen sobre el gradiente */}
-            <div className="relative w-full flex justify-center items-center z-10 ">
-              <img
-                src={image}
-                alt="Banner"
-                className="w-auto h-full md:h-[500px] object-cover"
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Indicadores del carrusel (solo visibles en pantallas medianas y grandes) */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10 hidden sm:flex">
-        {images.map((_, index) => (
-          <div
-            key={index}
-            className={`w-3 h-3 rounded-full cursor-pointer ${currentIndex === index ? 'bg-white' : 'bg-gray-500'}`}
-            onClick={() => goToSlide(index)}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  return <ImageCarousel images={banners} interval={5000} />;
 };
 
-export default ImageCarousel;
+export default BannerCarousel;
