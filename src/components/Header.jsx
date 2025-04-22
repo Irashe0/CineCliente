@@ -63,13 +63,6 @@ const Header = () => {
     }
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    setUser(null)
-    navigate("/")
-  }
-
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen)
     if (isSearchOpen) {
@@ -112,18 +105,9 @@ const Header = () => {
 
             {user ? (
               <div className="flex items-center space-x-4">
-                <Link
-                  to={`/perfil/${user.id}`}
-                  className="text-lg font-semibold text-[#CDAA7D]"
-                >
+                <Link to={`/dashboard/${user.id}`} className="text-lg font-semibold text-[#CDAA7D]">
                   {user.name}
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-white hover:text-[#CDAA7D] py-2 px-4 transition-all"
-                >
-                  Cerrar sesión
-                </button>
               </div>
             ) : (
               <div className="flex items-center space-x-4">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import BannerCarousel from "../components/Carrusel";  
-import MovieList from "../components/MovieList";
+import CinesList from "../components/CinesList";
 
 function Home() {
   const [showButton, setShowButton] = useState(false);
@@ -20,7 +20,7 @@ function Home() {
     <div className="relative bg-[var(--gris-oscuro)]">
       <Header />
       <BannerCarousel />
-      <MovieList />
+      <CinesList />
       <Footer />
       
       {showButton && (
