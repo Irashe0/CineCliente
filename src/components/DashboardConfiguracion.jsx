@@ -19,13 +19,11 @@ export default function DashboardConfiguracion({ user }) {
   const API_URL = import.meta.env.VITE_API_URL || "https://laravelcine-cine-zeocca.laravel.cloud/api";
   const navigate = useNavigate();
 
-  // Validación de contraseña
   const validarContraseña = (password) => {
     const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{6,}$/;
     return regex.test(password);
   };
 
-  // Función para actualizar la contraseña
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setError("");
@@ -67,13 +65,13 @@ export default function DashboardConfiguracion({ user }) {
       if (!response.ok) throw new Error(data.message || "Error al actualizar la contraseña.");
 
       setSuccess("Contraseña actualizada exitosamente.");
+      setTimeout(() => setSuccess(""), 2000);
 
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // Función para actualizar el correo
   const handleEmailChange = async (e) => {
     e.preventDefault();
     setError("");
@@ -100,7 +98,9 @@ export default function DashboardConfiguracion({ user }) {
       if (!response.ok) throw new Error(data.message || "Error al actualizar el correo.");
 
       setSuccess("Correo actualizado exitosamente.");
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => {
+        setSuccess("");
+      }, 2000);
 
     } catch (err) {
       setError(err.message);
@@ -116,7 +116,11 @@ export default function DashboardConfiguracion({ user }) {
           className={`p-3 flex-1 text-center font-semibold ${
             activeTab === "password" ? "text-[var(--principal)] border-b-2 border-[var(--principal)]" : "text-gray-400"
           }`}
-          onClick={() => setActiveTab("password")}
+          onClick={() => {
+            setActiveTab("password");
+            setError("");
+            setSuccess("");
+          }}
         >
           Cambiar Contraseña
         </button>
@@ -124,13 +128,17 @@ export default function DashboardConfiguracion({ user }) {
           className={`p-3 flex-1 text-center font-semibold ${
             activeTab === "email" ? "text-[var(--principal)] border-b-2 border-[var(--principal)]" : "text-gray-400"
           }`}
-          onClick={() => setActiveTab("email")}
+          onClick={() => {
+            setActiveTab("email");
+            setError("");
+            setSuccess("");
+          }}
         >
           Cambiar Correo
         </button>
       </div>
 
-      <div className="bg-[#1A1A1A] p-6 rounded-lg border border-gray-700 space-y-6">
+      <div className="bg-[#1A1A1A] p-6 rounded-lg border border-gray-700 space-y-6 w-1/2 mx-auto">
         {activeTab === "password" && (
           <>
             <p className="text-sm text-gray-400">Actualiza tu contraseña para mantener tu cuenta segura.</p>
@@ -186,6 +194,11 @@ export default function DashboardConfiguracion({ user }) {
                   {showConf ? <EyeOff /> : <Eye />}
                 </button>
               </div>
+
+              {/* Mensajes */}
+              {error && <p className="text-red-500 text-center">{error}</p>}
+              {success && <p className="text-green-500 text-center">{success}</p>}
+
               <button type="submit" className="w-full bg-[var(--principal)] text-black px-4 py-2 rounded font-semibold hover:bg-opacity-80">
                 Actualizar Contraseña
               </button>
@@ -207,6 +220,11 @@ export default function DashboardConfiguracion({ user }) {
                   required
                 />
               </div>
+
+              {/* Mensajes */}
+              {error && <p className="text-red-500 text-center">{error}</p>}
+              {success && <p className="text-green-500 text-center">{success}</p>}
+
               <button type="submit" className="w-full bg-[var(--principal)] text-black px-4 py-2 rounded font-semibold hover:bg-opacity-80">
                 Guardar Correo
               </button>

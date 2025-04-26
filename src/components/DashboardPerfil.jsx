@@ -1,8 +1,18 @@
 "use client"
 
-import { UserCircle } from "lucide-react"
+import { useEffect, useState } from "react";
+import { UserCircle } from "lucide-react";
 
-export default function DashboardPerfil({ user }) {
+export default function DashboardPerfil({ user: initialUser }) {
+  const [user, setUser] = useState(initialUser);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   return (
     <>
       <h2 className="text-2xl font-semibold mb-4">Mi Perfil</h2>
