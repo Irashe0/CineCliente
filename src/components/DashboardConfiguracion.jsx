@@ -141,10 +141,9 @@ export default function DashboardConfiguracion({ user }) {
       <div className="bg-[#1A1A1A] p-6 rounded-lg border border-gray-700 space-y-6 w-1/2 mx-auto">
         {activeTab === "password" && (
           <>
-            <p className="text-sm text-gray-400">Actualiza tu contraseña para mantener tu cuenta segura.</p>
             <form onSubmit={handlePasswordChange} className="space-y-5">
               <div className="relative">
-                <label className="block text-sm mb-1">Contraseña Actual</label>
+                <label className="block text-lg mb-1">Contraseña Actual</label>
                 <input
                   type={showCur ? "text" : "password"}
                   className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
@@ -161,7 +160,7 @@ export default function DashboardConfiguracion({ user }) {
                 </button>
               </div>
               <div className="relative">
-                <label className="block text-sm mb-1">Nueva Contraseña</label>
+                <label className="block text-lg mb-1">Nueva Contraseña</label>
                 <input
                   type={showNew ? "text" : "password"}
                   className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
@@ -174,11 +173,11 @@ export default function DashboardConfiguracion({ user }) {
                   className="absolute right-2 top-8"
                   onClick={() => setShowNew(!showNew)}
                 >
-                  {showNew ? <EyeOff /> : <Eye />}
+                  {showNew ?  <Eye /> : <EyeOff />}
                 </button>
               </div>
               <div className="relative">
-                <label className="block text-sm mb-1">Confirmar Nueva Contraseña</label>
+                <label className="block text-lh mb-1">Confirmar Nueva Contraseña</label>
                 <input
                   type={showConf ? "text" : "password"}
                   className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
@@ -191,7 +190,7 @@ export default function DashboardConfiguracion({ user }) {
                   className="absolute right-2 top-8"
                   onClick={() => setShowConf(!showConf)}
                 >
-                  {showConf ? <EyeOff /> : <Eye />}
+                  {showConf ? <Eye /> : <EyeOff />}
                 </button>
               </div>
 
@@ -208,10 +207,9 @@ export default function DashboardConfiguracion({ user }) {
 
         {activeTab === "email" && (
           <>
-            <p className="text-sm text-gray-400">Cambia tu correo electrónico asociado a la cuenta.</p>
             <form onSubmit={handleEmailChange} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1">Correo Nuevo</label>
+                <label className="block text-lg mb-1">Correo Nuevo</label>
                 <input
                   type="email"
                   className="w-full p-2 bg-[#121212] border border-gray-700 rounded"

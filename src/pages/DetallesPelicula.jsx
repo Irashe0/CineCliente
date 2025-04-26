@@ -13,7 +13,12 @@ export default function MovieDetails() {
   const [loading, setLoading] = useState(true);
   const [multimedia, setMultimedia] = useState(null);
   const [movieTrailer, setMovieTrailer] = useState(null);
+  const navigate = useNavigate();
 
+  const irAReserva = () => {
+    navigate("/reserva");
+  };
+  
   useEffect(() => {
     fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/peliculas/${id}`)
       .then((res) => res.json())
@@ -63,7 +68,7 @@ export default function MovieDetails() {
   return (
     <>
 
-      <main className="min-h-screen flex flex-col text-white">
+      <main className="min-h-screen flex flex-col text-white bg-black">
         <Header />
         <div className="relative w-full h-[50vh] md:h-[60vh]">
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10 pointer-events-none" />
@@ -79,7 +84,7 @@ export default function MovieDetails() {
           </div>
         </div>
 
-        <section className="w-full max-w-6xl mx-auto mt-10 mb-10 px-4 py-12 bg-neutral-700 border-2 border-[#CDAA7D] rounded-lg border-opacity-50 shadow grid grid-cols-1 shadow-xl shadow shadow-neutral md:grid-cols-3 gap-12">
+        <section className="w-full max-w-6xl mx-auto mt-10 mb-10 px-4 py-12 bg-neutral-800 border-2 border-[#CDAA7D] rounded-lg border-opacity-50 shadow grid grid-cols-1 shadow-xl shadow shadow-neutral md:grid-cols-3 gap-12">
 
           <div className="md:col-span-1 flex justify-center">
             <div className="aspect-[2/3] w-full max-w-[300px] rounded-lg overflow-hidden">
@@ -138,8 +143,11 @@ export default function MovieDetails() {
             )}
 
             <div className="pt-8 flex justify-center">
-              <Boton className="py-4 px-8 text-xl font-semibold">Comprar entradas</Boton>
+              <Boton onClick={irAReserva} className="py-4 px-8 text-xl font-semibold">
+                Comprar entradas
+              </Boton>
             </div>
+
           </div>
         </section>
 

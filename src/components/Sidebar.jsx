@@ -56,7 +56,7 @@ export default function Sidebar({ user, selected, onSelect }) {
       </nav>
 
       <button
-        className="mt-auto flex items-center px-4 py-2 rounded-lg text-red-400 hover:bg-red-600 hover:text-white transition"
+        className="mt-auto flex items-center px-4 py-2 rounded-lg text-red-400 hover:text-red-800"
         onClick={() => {
           localStorage.removeItem("user")
           localStorage.removeItem("token")

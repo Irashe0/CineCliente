@@ -8,10 +8,10 @@ import SobreNosotros from "./pages/SobreNosotros"
 import FAQs from "./pages/FAQs"
 import Cines from "./pages/Cines"
 import Dashboard from "./pages/Dashboard"
+import Reserva from "./pages/Reserva"
 
 function App() {
   return (
-
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<Register />} />
@@ -22,6 +22,7 @@ function App() {
         <Route path="/faqs" element={<FAQs />} />
         <Route path="/cines" element={<Cines />} />
         <Route path="/dashboard/:userId" element={<Dashboard />} />
+        <Route path="/reserva" element={<Reserva/>}/>
       </Routes>
 
   )

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
 import Perfil from "../components/DashboardPerfil"
 import Configuracion from "../components/DashboardConfiguracion"
+import Footer from "../components/Footer";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null)
@@ -51,13 +52,20 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0F0F0F] text-[#E0E0E0]">
-      <Sidebar user={user} selected={page} onSelect={handleSelect} />
+    <div
+      className="grid min-h-screen bg-[#0F0F0F] text-[#E0E0E0] 
+                grid-cols-[250px_1fr] grid-rows-[auto_1fr_auto]"
+    >
+      <div className="row-span-2  bg-[#1A1A1A]">
+        <Sidebar user={user} selected={page} onSelect={handleSelect} />
+      </div>
 
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="p-8 overflow-auto">
         {page === "perfil" && <Perfil user={user} />}
         {page === "configuracion" && <Configuracion user={user} />}
       </main>
+
+      <Footer className="col-span-2" />
     </div>
-  )
+  );
 }

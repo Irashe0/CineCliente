@@ -1,0 +1,91 @@
+// src/components/Breadcrumbs.jsx
+import { useLocation, Link } from "react-router-dom";
+import {
+  Building2,
+  Clock,
+  Sofa,
+  CreditCard,
+  ChevronRight,
+} from "lucide-react";
+
+export default function Breadcrumbs() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  const steps = [
+    {
+      name: "Cine",
+      href: "/reserva/cine",
+      icon: <Building2 className="h-5 w-5" />,
+      active: pathname === "/reserva/cine" || pathname === "/reserva",
+    },
+    {
+      name: "Horario",
+      href: "/reserva/horario",
+      icon: <Clock className="h-5 w-5" />,
+      active: pathname === "/reserva/horario",
+      disabled: pathname === "/reserva" || pathname === "/reserva/cine",
+    },
+    {
+      name: "Butacas",
+      href: "/reserva/butacas",
+      icon: <Sofa className="h-5 w-5" />,
+      active: pathname === "/reserva/butacas",
+      disabled:
+        pathname === "/reserva" ||
+        pathname === "/reserva/cine" ||
+        pathname === "/reserva/horario",
+    },
+    {
+      name: "Pago",
+      href: "/reserva/pago",
+      icon: <CreditCard className="h-5 w-5" />,
+      active: pathname === "/reserva/pago",
+      disabled:
+        pathname === "/reserva" ||
+        pathname === "/reserva/cine" ||
+        pathname === "/reserva/horario" ||
+        pathname === "/reserva/butacas",
+    },
+  ];
+
+  return (
+    <nav aria-label="Progreso de reserva">
+      <ol className="flex flex-wrap items-center justify-center gap-1 md:gap-2 text-sm md:text-base">
+        {steps.map((step, index) => (
+          <li key={step.name} className="flex items-center">
+            {index > 0 && (
+              <ChevronRight className="h-4 w-4 mx-1 md:mx-2 text-muted-foreground flex-shrink-0" />
+            )}
+
+            <div
+              className={`flex items-center ${
+                step.active
+                  ? "text-primary font-medium"
+                  : step.disabled
+                  ? "text-muted-foreground"
+                  : "text-foreground"
+              }`}
+            >
+              <div
+                className={`flex items-center justify-center rounded-full p-1.5 md:p-2 ${
+                  step.active ? "bg-primary text-primary-foreground" : "bg-muted"
+                }`}
+              >
+                {step.icon}
+              </div>
+
+              {step.disabled ? (
+                <span className="ml-2">{step.name}</span>
+              ) : (
+                <Link to={step.href} className="ml-2 hover:underline">
+                  {step.name}
+                </Link>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
