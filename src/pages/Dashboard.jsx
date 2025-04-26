@@ -1,58 +1,63 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+"use client"
 
-const Dashboard = () => {
-    const { userId } = useParams();
-    const [user, setUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const navigate = useNavigate();
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Sidebar from "../components/Sidebar"
+import Perfil from "../components/DashboardPerfil"
+import Configuracion from "../components/DashboardConfiguracion"
 
-    useEffect(() => {
-        console.log("userId en useEffect:", userId);
+export default function Dashboard() {
+  const [user, setUser] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState("perfil")
+  const navigate = useNavigate()
 
-        if (!userId) {
-            console.error("User ID no encontrado");
-            navigate("/login");
-        } else {
-            const fetchUser = async () => {
-                try {
-                    const response = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/usuarios/${userId}`);
-                    const data = await response.json();
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const stored = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
 
-                    if (response.ok) {
-                        setUser(data);
-                    } else {
-                        throw new Error(data.message || "Error en la solicitud");
-                    }
-                } catch (error) {
-                    console.error("Error fetching user:", error);
-                    navigate("/login");
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-
-            fetchUser();
+        if (!stored || !token) {
+          navigate("/login");
+          return;
         }
-    }, [userId, navigate]);
 
-    if (isLoading) {
-        return <div>Cargando...</div>;
-    }
+        const res = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/usuarios/${stored.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
 
-    return (
-        <div className="container mx-auto p-6">
-            {user ? (
-                <>
-                    <h1 className="text-3xl font-semibold">Bienvenido, {user.name}</h1>
-                    <p>Email: {user.email}</p>
-                    <p>Fecha de registro: {new Date(user.createdAt).toLocaleDateString()}</p>
-                </>
-            ) : (
-                <p>No se pudo cargar la información del usuario.</p>
-            )}
-        </div>
-    );
-};
+        if (!res.ok) throw new Error('No se pudo cargar la información del usuario.');
 
-export default Dashboard;
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        setError("No se pudo cargar la información del usuario.");
+      } finally {
+        setLoading(false); 
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
+
+  if (error) return <div className="text-red-500 p-6">{error}</div>
+  if (!user) return <div className="p-6 text-white">Cargando...</div>
+
+  const handleSelect = (sel) => {
+    if (sel === "logout") return navigate("/login")
+    setPage(sel)
+  }
+
+  return (
+    <div className="flex min-h-screen bg-[#0F0F0F] text-[#E0E0E0]">
+      <Sidebar user={user} selected={page} onSelect={handleSelect} />
+
+      <main className="flex-1 p-8 overflow-auto">
+        {page === "perfil" && <Perfil user={user} />}
+        {page === "configuracion" && <Configuracion user={user} />}
+      </main>
+    </div>
+  )
+}

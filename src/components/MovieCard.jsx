@@ -6,7 +6,7 @@ const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative overflow-hidden rounded-md shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] border-opacity-50 w-full max-w-[300px] h-auto aspect-[3/4] group transition-transform duration-300 ease-in-out hover:scale-105">
+    <div className="relative overflow-hidden rounded-md shadow-[rgba(0,0,0,0.25)] border-2 border-[#CDAA7D] border-opacity-50 w-full max-w-[300px] h-auto aspect-[3/4] group transition-transform duration-300 ease-in-out hover:scale-105">
 
       <img
         className="w-full h-full object-cover"

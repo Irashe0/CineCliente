@@ -17,12 +17,8 @@ export default function ListadoPeliculas() {
               `https://laravelcine-cine-zeocca.laravel.cloud/api/multimedia?id_pelicula=${peli.id_pelicula}`
             );
             const multimedia = await resMultimedia.json();
-            console.log(`Multimedia de ${peli.titulo}:`, multimedia);
-
-            // Filtrar multimedia por la película específica
             const multimediaFiltrada = multimedia.filter(m => m.id_pelicula === peli.id_pelicula);
 
-            // Asignar valores con validación
             const poster = multimediaFiltrada.find((m) => m.portada)?.portada || "https://via.placeholder.com/300";
             const trailer = multimediaFiltrada.find((m) => m.trailer)?.trailer || "";
 

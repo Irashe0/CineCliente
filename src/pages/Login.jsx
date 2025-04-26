@@ -14,39 +14,49 @@ export default function Login() {
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-
+    e.preventDefault();
+    setError("");
+  
     try {
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) throw new Error(data.message || "Correo o contraseña incorrectos")
-
-      console.log("Login exitoso:", data)
-      localStorage.setItem("token", data.token)
-
-      const userResponse = await fetch(`${API_URL}/user`, {
+        body: JSON.stringify({ email, password }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) throw new Error(data.message || "Correo o contraseña incorrectos");
+  
+      console.log("Login exitoso:", data);
+  
+      localStorage.setItem("token", data.token);
+  
+      const userResponse = await fetch(`${API_URL}/usuarios`, {
         method: "GET",
-        headers: { "Authorization": `Bearer ${data.token}` }
-      })
-
-      const userData = await userResponse.json()
-      localStorage.setItem("user", JSON.stringify({ name: userData.name }))
-
-
-      navigate("/")
-
+        headers: { "Authorization": `Bearer ${data.token}` },
+      });
+  
+      
+      const userData = await userResponse.json();
+  
+      if (userData && userData.length > 0) {
+        const user = userData[0];  
+        localStorage.setItem("user", JSON.stringify({ id: user.id, name: user.name }));
+        localStorage.setItem("userId", user.id);  
+  
+        console.log("Datos guardados en localStorage:", user);
+      } else {
+        console.error("No se encontró el usuario.");
+      }
+  
+      navigate("/");
+  
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     }
-  }
-
+  };
+  
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
 
