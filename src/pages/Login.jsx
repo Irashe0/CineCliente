@@ -18,6 +18,7 @@ export default function Login() {
     setError("");
   
     try {
+      // Paso 1: Hacer la petición de login
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,27 +31,31 @@ export default function Login() {
   
       console.log("Login exitoso:", data);
   
+      // Guardamos el token en el localStorage
       localStorage.setItem("token", data.token);
   
-      const userResponse = await fetch(`${API_URL}/usuarios`, {
+      // Paso 2: Obtenemos los datos del usuario autenticado
+      const userResponse = await fetch(`${API_URL}/user`, {
         method: "GET",
         headers: { "Authorization": `Bearer ${data.token}` },
       });
   
-      
       const userData = await userResponse.json();
   
-      if (userData && userData.length > 0) {
-        const user = userData[0];  
-        localStorage.setItem("user", JSON.stringify({ id: user.id, name: user.name }));
-        localStorage.setItem("userId", user.id);  
+      if (userResponse.ok) {
+        // Guardamos los datos del usuario en el localStorage
+        localStorage.setItem("user", JSON.stringify({
+          id: userData.id,
+          name: userData.name,
+          email: userData.email
+        }));
+        localStorage.setItem("userId", userData.id);
   
-        console.log("Datos guardados en localStorage:", user);
+        console.log("Datos del usuario guardados en localStorage:", userData);
+        navigate("/");
       } else {
-        console.error("No se encontró el usuario.");
+        throw new Error("No se encontró el usuario.");
       }
-  
-      navigate("/");
   
     } catch (err) {
       setError(err.message);
@@ -59,7 +64,6 @@ export default function Login() {
   
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
-
       <div className="absolute top-6 left-0 right-0 text-center">
         <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
           CineLuxe
