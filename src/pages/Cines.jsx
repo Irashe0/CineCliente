@@ -17,9 +17,10 @@ function Home() {
   }, []);
 
   return (
-    <div className="relative bg-[var(--gris-oscuro)]">
+    <div className="relative bg-gradient-to-t from-[#0F0F0F] to-[#1E1E1E]">
       <Header />
       <BannerCarousel />
+      <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-wide text-[var(--principal)] text-center mt-8">  Nuestros Cines</h1>
       <CinesList />
       <Footer />
       

@@ -37,7 +37,7 @@ const CinesCard = ({ id, nombre, ubicacion, telefono }) => {
         <div className="flex flex-col space-y-2 w-full">
           <Boton
             className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md"
-            onClick={() => navigate(`/comprarEntradas`)}
+            onClick={() => navigate(`/reserva`)}
           >
             Comprar Entradas
           </Boton>

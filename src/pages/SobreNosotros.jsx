@@ -48,6 +48,14 @@ export default function AboutUs() {
                 creamos, está pensado para brindarte una noche inolvidable.
               </p>
             </div>
+
+            <div className="mt-8">
+              <h3 className="text-2xl font-serif font-bold text-[#CDAA7D] mb-3">Nuestro Horario</h3>
+              <p className="text-[#E0E0E0]">
+                Estamos abiertos todos los días de la semana, de <span className="text-[#CDAA7D] font-semibold">10:00 a 22:00 horas</span> . ¡Ven y disfruta de una película
+                con nosotros!
+              </p>
+            </div>
           </div>
         </div>
       </div>

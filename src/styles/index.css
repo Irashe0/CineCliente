@@ -105,6 +105,11 @@ section, article, header {
   padding: 0 1rem;
 }
 
+.reserva-container {
+  margin-top: 120px; 
+  margin-bottom: 80px;
+}
+
 * {
   box-sizing: border-box;
 }

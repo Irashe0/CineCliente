@@ -1,5 +1,4 @@
-// src/components/Breadcrumbs.jsx
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useParams } from "react-router-dom";
 import {
   Building2,
   Clock,
@@ -11,41 +10,35 @@ import {
 export default function Breadcrumbs() {
   const location = useLocation();
   const pathname = location.pathname;
+  const { id } = useParams();  
 
   const steps = [
     {
       name: "Cine",
       href: "/reserva/cine",
       icon: <Building2 className="h-5 w-5" />,
-      active: pathname === "/reserva/cine" || pathname === "/reserva",
+      active: pathname === "/reserva/cine" || pathname === "/reserva" || pathname.includes("/reserva/" + id),
     },
     {
       name: "Horario",
       href: "/reserva/horario",
       icon: <Clock className="h-5 w-5" />,
       active: pathname === "/reserva/horario",
-      disabled: pathname === "/reserva" || pathname === "/reserva/cine",
+      disabled: pathname === "/reserva" || pathname === "/reserva/cine" || pathname.includes("/reserva/" + id),
     },
     {
       name: "Butacas",
       href: "/reserva/butacas",
       icon: <Sofa className="h-5 w-5" />,
       active: pathname === "/reserva/butacas",
-      disabled:
-        pathname === "/reserva" ||
-        pathname === "/reserva/cine" ||
-        pathname === "/reserva/horario",
+      disabled: pathname === "/reserva" || pathname === "/reserva/cine" || pathname === "/reserva/horario" || pathname.includes("/reserva/" + id),
     },
     {
       name: "Pago",
       href: "/reserva/pago",
       icon: <CreditCard className="h-5 w-5" />,
       active: pathname === "/reserva/pago",
-      disabled:
-        pathname === "/reserva" ||
-        pathname === "/reserva/cine" ||
-        pathname === "/reserva/horario" ||
-        pathname === "/reserva/butacas",
+      disabled: pathname === "/reserva" || pathname === "/reserva/cine" || pathname === "/reserva/horario" || pathname === "/reserva/butacas" || pathname.includes("/reserva/" + id),
     },
   ];
 
