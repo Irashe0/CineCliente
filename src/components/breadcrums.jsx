@@ -52,7 +52,7 @@ export default function Breadcrumbs() {
               {step.disabled ? (
                 <span className="ml-2">{step.name}</span>
               ) : (
-                <Link to={step.href} className="ml-2 hover:underline">{step.name}</Link>
+                <Link to={step.href} className="ml-2 hover:underline text-white">{step.name}</Link>
               )}
             </div>
           </li>

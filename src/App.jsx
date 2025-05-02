@@ -10,7 +10,7 @@ import Cines from "./pages/Cines";
 import Dashboard from "./pages/Dashboard";
 
 import ReservaLayout from "./layouts/ReservaLayout";
-import SelectCines from "./components/SelectCine";
+import Cinesreserva from "./components/SelectCine";
 import HorarioPage from "./components/Horarios";
 import ButacasPage from "./components/Butacas";
 import PagoPage from "./components/Pago";
@@ -29,11 +29,12 @@ function App() {
       <Route path="/dashboard/:userId" element={<Dashboard />} />
 
       <Route path="/reserva/:id" element={<ReservaLayout />}>
-        <Route index element={<SelectCines />} />
+        <Route index element={<Cinesreserva />} />
         <Route path="horario" element={<HorarioPage />} />
         <Route path="butacas" element={<ButacasPage />} />
         <Route path="pago" element={<PagoPage />} />
       </Route>
+
     </Routes>
   );
 }

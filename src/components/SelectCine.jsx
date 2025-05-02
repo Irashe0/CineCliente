@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import CinesCardReserva from "../components/CineCardReserva"
+import CinesCard from "./CineCardReserva"
 
 export default function CinesList() {
     const [cines, setCines] = useState([])
@@ -25,7 +25,7 @@ export default function CinesList() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-20 justify-items-center">
             {Array.isArray(cines) && cines.map((cine) => (
                 cine?.id_cine && (
-                    <CinesCardReserva
+                    <CinesCard
                         key={cine.id_cine}
                         id={cine.id_cine}
                         nombre={cine.nombre}
