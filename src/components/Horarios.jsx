@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock } from "lucide-react";
-import Boton from "../ComponentesExternos/Boton";
+import Boton from "../components/ComponentesExternos/Boton";
 
 export default function HorarioPage() {
   const navigate = useNavigate();

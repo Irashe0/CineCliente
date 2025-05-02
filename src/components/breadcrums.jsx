@@ -1,44 +1,38 @@
 import { useLocation, Link, useParams } from "react-router-dom";
-import {
-  Building2,
-  Clock,
-  Sofa,
-  CreditCard,
-  ChevronRight,
-} from "lucide-react";
+import { Building2, Clock, Sofa, CreditCard, ChevronRight } from "lucide-react";
 
 export default function Breadcrumbs() {
   const location = useLocation();
   const pathname = location.pathname;
-  const { id } = useParams();  
+  const { id, cineId } = useParams();  
 
   const steps = [
     {
       name: "Cine",
       href: "/reserva/cine",
       icon: <Building2 className="h-5 w-5" />,
-      active: pathname === "/reserva/cine" || pathname === "/reserva" || pathname.includes("/reserva/" + id),
+      active: pathname === "/reserva/cine" || pathname.includes(`/reserva/${id}/cine/${cineId}`),
     },
     {
       name: "Horario",
       href: "/reserva/horario",
       icon: <Clock className="h-5 w-5" />,
-      active: pathname === "/reserva/horario",
-      disabled: pathname === "/reserva" || pathname === "/reserva/cine" || pathname.includes("/reserva/" + id),
+      active: pathname.includes("/reserva/horario"),
+      disabled: pathname === "/reserva" || pathname.includes("/reserva/cine"),
     },
     {
       name: "Butacas",
       href: "/reserva/butacas",
       icon: <Sofa className="h-5 w-5" />,
-      active: pathname === "/reserva/butacas",
-      disabled: pathname === "/reserva" || pathname === "/reserva/cine" || pathname === "/reserva/horario" || pathname.includes("/reserva/" + id),
+      active: pathname.includes("/reserva/butacas"),
+      disabled: pathname === "/reserva" || pathname.includes("/reserva/cine") || pathname.includes("/reserva/horario"),
     },
     {
       name: "Pago",
       href: "/reserva/pago",
       icon: <CreditCard className="h-5 w-5" />,
       active: pathname === "/reserva/pago",
-      disabled: pathname === "/reserva" || pathname === "/reserva/cine" || pathname === "/reserva/horario" || pathname === "/reserva/butacas" || pathname.includes("/reserva/" + id),
+      disabled: pathname === "/reserva" || pathname.includes("/reserva/cine") || pathname.includes("/reserva/horario") || pathname.includes("/reserva/butacas"),
     },
   ];
 
@@ -51,29 +45,14 @@ export default function Breadcrumbs() {
               <ChevronRight className="h-4 w-4 mx-1 md:mx-2 text-muted-foreground flex-shrink-0" />
             )}
 
-            <div
-              className={`flex items-center ${
-                step.active
-                  ? "text-primary font-medium"
-                  : step.disabled
-                  ? "text-muted-foreground"
-                  : "text-foreground"
-              }`}
-            >
-              <div
-                className={`flex items-center justify-center rounded-full p-1.5 md:p-2 ${
-                  step.active ? "bg-primary text-primary-foreground" : "bg-muted"
-                }`}
-              >
+            <div className={`flex items-center ${step.active ? "text-primary font-medium" : step.disabled ? "text-muted-foreground" : "text-foreground"}`}>
+              <div className={`flex items-center justify-center rounded-full p-1.5 md:p-2 ${step.active ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                 {step.icon}
               </div>
-
               {step.disabled ? (
                 <span className="ml-2">{step.name}</span>
               ) : (
-                <Link to={step.href} className="ml-2 hover:underline">
-                  {step.name}
-                </Link>
+                <Link to={step.href} className="ml-2 hover:underline">{step.name}</Link>
               )}
             </div>
           </li>

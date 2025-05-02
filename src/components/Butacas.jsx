@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Boton from "../ComponentesExternos/Boton";
+import Boton from "../components/ComponentesExternos/Boton";
 
 export default function ButacasPage() {
   const navigate = useNavigate();

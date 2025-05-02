@@ -1,13 +1,14 @@
 // src/pages/PagoPage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Boton from "../components/ComponentesExternos/Boton";
 import {
   CreditCard,
   Wallet,
   Building,
   CheckCircle2,
 } from "lucide-react";
-import Boton from "../ComponentesExternos/Boton";
+
 
 export default function PagoPage() {
   const navigate = useNavigate();
