@@ -1,61 +1,66 @@
-// src/pages/HorarioPage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock } from "lucide-react";
 import Boton from "../components/ComponentesExternos/Boton";
 
-export default function HorarioPage() {
+export default function Horarios() {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState("hoy");
   const [selectedHorario, setSelectedHorario] = useState(null);
-  const [cineSeleccionado, setCineSeleccionado] = useState(null);
-
-  useEffect(() => {
-    const cine = localStorage.getItem("cineSeleccionado");
-    if (!cine) {
-      navigate("/reserva/cine");
-    } else {
-      setCineSeleccionado(cine);
-    }
-  }, [navigate]);
+  const [peliculas, setPeliculas] = useState([]);
+  const [selectedPelicula, setSelectedPelicula] = useState(null);
 
   const fechas = [
-    { id: "hoy", label: "Hoy", fecha: "26 Abr" },
-    { id: "manana", label: "Mañana", fecha: "27 Abr" },
-    { id: "pasado", label: "Pasado", fecha: "28 Abr" },
+    { id: "hoy", label: "Hoy", fecha: new Date() },
+    { id: "manana", label: "Mañana", fecha: new Date(Date.now() + 86400000) },
+    { id: "pasado", label: "Pasado", fecha: new Date(Date.now() + 2 * 86400000) },
   ];
 
-  const peliculas = [
-    {
-      id: "pelicula1",
-      titulo: "Dune: Parte 2",
-      duracion: "166 min",
-      clasificacion: "B15",
-      imagen: "/placeholder.svg",
-      horarios: ["14:30", "17:45", "20:15", "22:30"],
-    },
-    {
-      id: "pelicula2",
-      titulo: "Deadpool & Wolverine",
-      duracion: "120 min",
-      clasificacion: "C",
-      imagen: "/placeholder.svg",
-      horarios: ["13:00", "15:30", "18:00", "20:30", "23:00"],
-    },
-    {
-      id: "pelicula3",
-      titulo: "Inside Out 2",
-      duracion: "105 min",
-      clasificacion: "A",
-      imagen: "/placeholder.svg",
-      horarios: ["12:15", "14:30", "16:45", "19:00"],
-    },
-  ];
+  const fechaSeleccionada = fechas.find((f) => f.id === selectedDate)?.fecha
+    .toISOString()
+    .split("T")[0];
+
+  useEffect(() => {
+    const peliculaId = localStorage.getItem("peliculaSeleccionadaId");
+    if (peliculaId) {
+      setSelectedPelicula({ id_pelicula: peliculaId });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPelicula) return;
+
+    const fetchHorarios = async () => {
+      try {
+        const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
+        const resHorarios = await fetch(
+          `${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`
+        );
+        const horariosData = await resHorarios.json();
+
+        const horarios = horariosData
+          .filter((h) => h.fecha_hora.startsWith(fechaSeleccionada)) 
+          .map((h) => h.fecha_hora.split("T")[1].slice(0, 5)); 
+
+        setPeliculas([{
+          ...selectedPelicula,
+          horarios,  
+        }]);
+      } catch (err) {
+        console.error("Error al cargar los horarios:", err);
+      }
+    };
+
+    fetchHorarios();
+  }, [selectedPelicula, selectedDate]);  
 
   const handleContinuar = () => {
-    if (selectedHorario) {
+    if (selectedHorario && selectedPelicula) {
+      const peliculaId = selectedPelicula.id_pelicula;
       localStorage.setItem("fechaSeleccionada", selectedDate);
       localStorage.setItem("horarioSeleccionado", selectedHorario);
+      localStorage.setItem("peliculaSeleccionada", JSON.stringify(selectedPelicula));
+
       navigate("/reserva/butacas");
     }
   };
@@ -66,13 +71,9 @@ export default function HorarioPage() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold">Selecciona Horario</h2>
-        <p className="text-gray-400">Paso 2 de 4: Elige la fecha y horario de la función</p>
+      <div className="text-center">
+        <h2>{selectedPelicula?.titulo}</h2> 
       </div>
-
-      {/* Tabs de Fechas */}
       <div>
         <div className="grid grid-cols-3 gap-2 mb-6">
           {fechas.map((fecha) => (
@@ -80,23 +81,26 @@ export default function HorarioPage() {
               key={fecha.id}
               onClick={() => setSelectedDate(fecha.id)}
               className={`flex flex-col items-center border rounded-lg py-2 ${
-                selectedDate === fecha.id ? "bg-blue-500 text-white" : "bg-white text-gray-700"
+                selectedDate === fecha.id
+                  ? "bg-[var(--principal)] text-white"
+                  : "bg-white text-gray-700"
               }`}
             >
               <span className="font-medium">{fecha.label}</span>
-              <span className="text-xs">{fecha.fecha}</span>
+              <span className="text-xs">
+                {fecha.fecha.toLocaleDateString("es-ES")}
+              </span>
             </button>
           ))}
         </div>
 
-        {/* Contenido de cada fecha */}
         <div className="space-y-6">
           {peliculas.map((pelicula) => (
-            <div key={pelicula.id} className="border rounded-lg overflow-hidden">
+            <div key={pelicula.id_pelicula} className="border rounded-lg overflow-hidden">
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/4 lg:w-1/5 p-4 flex justify-center md:justify-start">
                   <img
-                    src={pelicula.imagen}
+                    src={pelicula.imagen || "/placeholder.svg"}
                     alt={pelicula.titulo}
                     className="w-24 h-36 object-cover rounded"
                   />
@@ -113,26 +117,36 @@ export default function HorarioPage() {
                     </div>
                   </div>
 
-                  {/* Horarios */}
                   <div>
-                    <h4 className="text-sm font-medium mb-2">Horarios disponibles:</h4>
+                    <h4 className="text-sm font-medium mb-2">
+                      Horarios disponibles:
+                    </h4>
                     <div className="flex flex-wrap gap-2">
-                      {pelicula.horarios.map((horario) => {
-                        const horarioKey = `${pelicula.id}-${horario}`;
-                        return (
-                          <button
-                            key={horarioKey}
-                            onClick={() => setSelectedHorario(horarioKey)}
-                            className={`px-3 py-1 rounded text-sm border ${
-                              selectedHorario === horarioKey
-                                ? "bg-blue-500 text-white"
-                                : "bg-white text-gray-700"
-                            }`}
-                          >
-                            {horario}
-                          </button>
-                        );
-                      })}
+                      {pelicula.horarios.length > 0 ? (
+                        pelicula.horarios.map((horario) => {
+                          const horarioKey = `${pelicula.id_pelicula}-${horario}`;
+                          return (
+                            <button
+                              key={horarioKey}
+                              onClick={() => {
+                                setSelectedHorario(horarioKey);
+                                setSelectedPelicula(pelicula);  
+                              }}
+                              className={`px-3 py-1 rounded text-sm border ${
+                                selectedHorario === horarioKey
+                                  ? "bg-blue-500 text-white"
+                                  : "bg-white text-gray-700"
+                              }`}
+                            >
+                              {horario}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <span className="text-gray-400 text-sm">
+                          No hay horarios disponibles para esta fecha
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -142,7 +156,6 @@ export default function HorarioPage() {
         </div>
       </div>
 
-      {/* Botones de navegación */}
       <div className="flex justify-between mt-8">
         <Boton onClick={handleVolver} variante="outline">
           Volver

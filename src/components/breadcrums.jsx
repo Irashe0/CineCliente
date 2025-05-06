@@ -15,7 +15,7 @@ export default function Breadcrumbs() {
     },
     {
       name: "Horario",
-      href: "/reserva/horario",
+      href: "/reserva/{id}/horario",
       icon: <Clock className="h-5 w-5" />,
       active: pathname.includes("/reserva/horario"),
       disabled: pathname === "/reserva" || pathname.includes("/reserva/cine"),
@@ -52,7 +52,7 @@ export default function Breadcrumbs() {
               {step.disabled ? (
                 <span className="ml-2">{step.name}</span>
               ) : (
-                <Link to={step.href} className="ml-2 hover:underline text-white">{step.name}</Link>
+                <Link to={step.href} className="ml-2 text-[var(--principal)]">{step.name}</Link>
               )}
             </div>
           </li>
