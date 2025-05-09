@@ -1,8 +1,8 @@
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
-
+import { Link, useNavigate } from "react-router-dom"
 const Footer = () => {
   return (
-<footer className="bg-gradient-to-t from-black via-black/95 to-transparent text-white mt-auto py-3 md:py-4">
+    <footer className="bg-gradient-to-t from-black via-black/95 to-transparent text-white mt-auto py-3 md:py-4">
 
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
@@ -17,10 +17,21 @@ const Footer = () => {
           <div>
             <h4 className="text-md font-semibold mb-2 text-left">Información Adicional</h4>
             <ul className="text-xs space-y-1 text-left">
-              <li><a href="/SobreNosotros" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">Sobre Nosotros</a></li>
-              <li><a href="/faqs" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">FAQs</a></li>
-              <br />
-              <li><a href="/cines" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">Cines</a></li>
+              <li>
+                <Link href="/SobreNosotros" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
+                  Sobre Nosotros
+                </Link>
+              </li>
+              <li>
+                <Link href="/faqs" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
+                  FAQs
+                </Link>
+              </li>
+              <li className="pt-1">
+                <Link href="/cines" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
+                  Cines
+                </Link>
+              </li>
             </ul>
           </div>
 
