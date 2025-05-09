@@ -11,30 +11,28 @@ export default function Breadcrumbs() {
       name: "Cine",
       href: "/reserva/cine",
       icon: <Building2 className="h-5 w-5" />,
-      active: pathname === "/reserva/cine" || pathname.includes(`/reserva/${id}/cine/${cineId}`),
+      active: pathname === "/reserva/cine",
     },
     {
       name: "Horario",
-      href: "/reserva/{id}/horario",
+      href: `/reserva/${id}/horario`,
       icon: <Clock className="h-5 w-5" />,
       active: pathname.includes("/reserva/horario"),
-      disabled: pathname === "/reserva" || pathname.includes("/reserva/cine"),
     },
     {
       name: "Butacas",
-      href: "/reserva/butacas",
+      href: `/reserva/${id}/butacas`,
       icon: <Sofa className="h-5 w-5" />,
       active: pathname.includes("/reserva/butacas"),
-      disabled: pathname === "/reserva" || pathname.includes("/reserva/cine") || pathname.includes("/reserva/horario"),
     },
     {
       name: "Pago",
-      href: "/reserva/pago",
+      href: `/reserva/${id}/pago`,
       icon: <CreditCard className="h-5 w-5" />,
-      active: pathname === "/reserva/pago",
-      disabled: pathname === "/reserva" || pathname.includes("/reserva/cine") || pathname.includes("/reserva/horario") || pathname.includes("/reserva/butacas"),
+      active: pathname.includes("/reserva/pago"),
     },
   ];
+  
 
   return (
     <nav aria-label="Progreso de reserva">

@@ -1,261 +1,472 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Boton from "../components/ComponentesExternos/Boton";
-import {
-  CreditCard,
-  Wallet,
-  Building,
-  CheckCircle2,
-} from "lucide-react";
+import React, { useState } from "react";
+import { Lock, CreditCard, Wallet, DollarSign, Eye, EyeOff, CreditCardIcon, ShieldCheck, CheckCircle } from "lucide-react";
 
+const Pago = () => {
+  const [step, setStep] = useState("details");
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [showCardNumber, setShowCardNumber] = useState(false);
 
-export default function PagoPage() {
-  const navigate = useNavigate();
-  const [metodoPago, setMetodoPago] = useState("tarjeta");
-  const [cargando, setCargando] = useState(false);
-  const [completado, setCompletado] = useState(false);
-  const [resumen, setResumen] = useState(null);
-
-  useEffect(() => {
-    const cine = localStorage.getItem("cineSeleccionado");
-    const horario = localStorage.getItem("horarioSeleccionado");
-    const butacasJSON = localStorage.getItem("butacasSeleccionadas");
-
-    if (!cine || !horario || !butacasJSON) {
-      navigate("/reserva/cine");
-      return;
-    }
-
-    const butacas = JSON.parse(butacasJSON);
-    const [peliculaId, hora] = horario.split("-");
-    const nombrePelicula =
-      peliculaId === "pelicula1"
-        ? "Dune: Parte 2"
-        : peliculaId === "pelicula2"
-        ? "Deadpool & Wolverine"
-        : "Inside Out 2";
-    const nombreCine =
-      cine === "cine1"
-        ? "Cinépolis Plaza Mayor"
-        : cine === "cine2"
-        ? "Cinemex Premium"
-        : "Cinemark Luxury";
-
-    setResumen({
-      cine: nombreCine,
-      pelicula: nombrePelicula,
-      horario: hora,
-      butacas,
-      total: butacas.length * 85,
-    });
-  }, [navigate]);
-
-  const handlePagar = () => {
-    setCargando(true);
-    setTimeout(() => {
-      setCargando(false);
-      setCompletado(true);
-      localStorage.removeItem("cineSeleccionado");
-      localStorage.removeItem("fechaSeleccionada");
-      localStorage.removeItem("horarioSeleccionado");
-      localStorage.removeItem("butacasSeleccionadas");
-    }, 2000);
+  const formatCardNumber = (value) => {
+    return value.replace(/\s+/g, '').replace(/(\d{4})/g, '$1 ').trim();
   };
 
-  const handleVolver = () => navigate("/reserva/butacas");
-
-  if (completado) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-6">
-        <div className="bg-green-100 rounded-full p-4">
-          <CheckCircle2 className="h-16 w-16 text-green-600" />
-        </div>
-        <h2 className="text-2xl font-bold">¡Reserva Completada!</h2>
-        <p className="text-center text-gray-500 max-w-md">
-          Tu reserva ha sido procesada correctamente. Hemos enviado los detalles a tu correo electrónico.
-        </p>
-
-        <div className="border rounded-lg w-full max-w-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold">Detalles de la Reserva</h3>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <span className="text-gray-500">Película:</span>
-            <span className="font-medium">{resumen?.pelicula}</span>
-            <span className="text-gray-500">Cine:</span>
-            <span className="font-medium">{resumen?.cine}</span>
-            <span className="text-gray-500">Horario:</span>
-            <span className="font-medium">{resumen?.horario}</span>
-            <span className="text-gray-500">Butacas:</span>
-            <span className="font-medium">{resumen?.butacas.join(", ")}</span>
-            <span className="text-gray-500">Total pagado:</span>
-            <span className="font-bold">${resumen?.total.toFixed(2)}</span>
-          </div>
-        </div>
-
-        <Boton onClick={() => navigate("/")} variante="outline">
-          Volver al Inicio
-        </Boton>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6 p-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold">Método de Pago</h2>
-        <p className="text-gray-500">Paso 4 de 4: Completa tu compra</p>
-      </div>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="flex flex-col lg:flex-row gap-6">
 
-      <div className="grid gap-6 md:grid-cols-5">
-        {/* Selección de método */}
-        <div className="md:col-span-3 space-y-6">
-          <div className="border rounded-lg p-6 space-y-4">
-            <h3 className="text-lg font-semibold">Selecciona un método de pago</h3>
-
-            <div className="space-y-4">
-              <div
-                onClick={() => setMetodoPago("tarjeta")}
-                className={`flex items-center gap-2 p-3 rounded cursor-pointer border ${
-                  metodoPago === "tarjeta"
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                <CreditCard className="h-5 w-5" />
-                Tarjeta de crédito/débito
-              </div>
-              <div
-                onClick={() => setMetodoPago("paypal")}
-                className={`flex items-center gap-2 p-3 rounded cursor-pointer border ${
-                  metodoPago === "paypal"
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                <Wallet className="h-5 w-5" />
-                PayPal
-              </div>
-              <div
-                onClick={() => setMetodoPago("transferencia")}
-                className={`flex items-center gap-2 p-3 rounded cursor-pointer border ${
-                  metodoPago === "transferencia"
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-gray-700 border-gray-300"
-                }`}
-              >
-                <Building className="h-5 w-5" />
-                Transferencia bancaria
+        <div className="rounded-lg border border-[#3a3a3a] bg-[#14130f] text-white shadow-lg w-full lg:w-2/3">
+          <div className="rounded-t-lg border-b border-[#3a3a3a] p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-[#cdaa7d] text-2xl font-bold">Pasarela de Pago Segura</h3>
+                <p className="text-gray-400">Complete su compra de forma segura</p>
               </div>
             </div>
-
-            {metodoPago === "tarjeta" && (
-              <div className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <label className="block text-base font-medium">Nombre en la tarjeta</label>
-                  <input
-                    type="text"
-                    className="w-full bg-[#121212] border border-gray-700 rounded p-2 text-white"
-                    placeholder="Nombre completo"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-base font-medium">Número de tarjeta</label>
-                  <input
-                    type="text"
-                    className="w-full bg-[#121212] border border-gray-700 rounded p-2 text-white"
-                    placeholder="1234 5678 9012 3456"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-base font-medium">Fecha de expiración</label>
-                    <input
-                      type="text"
-                      className="w-full bg-[#121212] border border-gray-700 rounded p-2 text-white"
-                      placeholder="MM/AA"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-base font-medium">CVV</label>
-                    <input
-                      type="password"
-                      maxLength={4}
-                      className="w-full bg-[#121212] border border-gray-700 rounded p-2 text-white"
-                      placeholder="123"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {metodoPago === "paypal" && (
-              <div className="mt-4 p-4 bg-gray-100 rounded text-center text-gray-700">
-                Serás redirigido a PayPal para completar el pago.
-              </div>
-            )}
-
-            {metodoPago === "transferencia" && (
-              <div className="mt-4 p-4 bg-gray-100 rounded space-y-2 text-gray-700">
-                <p className="font-medium">Datos bancarios:</p>
-                <p className="text-sm">Banco: Banco Nacional</p>
-                <p className="text-sm">Cuenta: 1234-5678-9012-3456</p>
-                <p className="text-sm">Titular: Cines Unidos S.A.</p>
-                <p className="text-sm">Envía el comprobante a pagos@cinesunidos.com</p>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-[#cdaa7d]" />
+              <span className="text-gray-400 text-sm">Conexión segura</span>
+            </div>
           </div>
         </div>
+        <div className="p-6 space-y-6">
+          <div className="w-full">
+            <div className="flex rounded-md overflow-hidden mb-6 grid grid-cols-3 mb-6 bg-[#14130f]">
+              <button
+                onClick={() => step !== "details" && setStep("details")}
+                disabled={false}
+                className="flex-1 py-2 px-4 text-center data-[state=active]:bg-[#cdaa7d] data-[state=active]:text-[#14130f]"
+                data-state={step === "details" ? "active" : "inactive"}
+              >
+                1. Detalles
+              </button>
+              <button
+                onClick={() => step === "confirmation" && setStep("payment")}
+                disabled={false}
+                className="flex-1 py-2 px-4 text-center data-[state=active]:bg-[#cdaa7d] data-[state=active]:text-[#14130f]"
+                data-state={step === "payment" ? "active" : "inactive"}
+              >
+                2. Pago
+              </button>
+              <button
+                disabled
+                className="flex-1 py-2 px-4 text-center data-[state=active]:bg-[#cdaa7d] data-[state=active]:text-[#14130f]"
+                data-state={step === "confirmation" ? "active" : "inactive"}
+              >
+                3. Confirmación
+              </button>
+            </div>
 
-        {/* Resumen de compra */}
-        <div className="md:col-span-2">
-          <div className="border rounded-lg p-6 space-y-4">
-            <h3 className="text-lg font-semibold">Resumen de compra</h3>
-            {resumen && (
-              <>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Película:</span>
-                    <span>{resumen.pelicula}</span>
+            <div className={step === "details" ? "" : "hidden"}>
+              <div className="space-y-4 mt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName" className="block text-sm font-medium text-white">
+                      Nombre
+                    </label>
+                    <input
+                      id="firstName"
+                      type="text"
+                      placeholder="Nombre"
+                      className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Cine:</span>
-                    <span>{resumen.cine}</span>
+
+                  <div className="space-y-2">
+                    <label htmlFor="lastName" className="block text-sm font-medium text-white">
+                      Apellidos
+                    </label>
+                    <input
+                      id="lastName"
+                      type="text"
+                      placeholder="Apellidos"
+                      className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Horario:</span>
-                    <span>{resumen.horario}</span>
+
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-white">
+                    Correo electrónico
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="correo@ejemplo.com"
+                    className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="phone" className="block text-sm font-medium text-white">
+                    Teléfono
+                  </label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    placeholder="+34 600 000 000"
+                    className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="address" className="block text-sm font-medium text-white">
+                    Dirección
+                  </label>
+                  <input
+                    id="address"
+                    type="text"
+                    placeholder="Calle, número"
+                    className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="postalCode" className="block text-sm font-medium text-white">
+                      Código Postal
+                    </label>
+                    <input
+                      id="postalCode"
+                      type="text"
+                      placeholder="28001"
+                      className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Butacas:</span>
-                    <span>{resumen.butacas.join(", ")}</span>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label htmlFor="city" className="block text-sm font-medium text-white">
+                      Ciudad
+                    </label>
+                    <input
+                      id="city"
+                      type="text"
+                      placeholder="Madrid"
+                      className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                    />
                   </div>
                 </div>
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Entradas ({resumen.butacas.length})</span>
-                    <span>${(resumen.butacas.length * 85).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Cargo por servicio</span>
-                    <span>$10.00</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg mt-2">
-                    <span>Total</span>
-                    <span>${(resumen.butacas.length * 85 + 10).toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div className={step === "payment" ? "" : "hidden"}>
+              <div className="space-y-4 mt-0">
+                <div className="mb-6">
+                  <h3 className="text-white font-medium mb-2">Método de pago</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <input
+                        type="radio"
+                        id="card"
+                        name="paymentMethod"
+                        value="card"
+                        checked={paymentMethod === "card"}
+                        onChange={() => setPaymentMethod("card")}
+                        className="sr-only"
+                      />
+                      <button
+                        onClick={() => setMetodoPago("card")}
+                        className={`flex flex-col items-center justify-between rounded-md border-2 px-4 py-3 cursor-pointer transition ${paymentMethod === "card" ? "border-[var(--principal)] bg-neutral-800" : "border-gray-500 bg-neutral-900 hover:bg-neutral-800 hover:border-[var(--principal)]"
+                          }`}
+                      >
+                        <CreditCard className="mb-2 h-6 w-6 text-[var(--principal)]" />
+                        <span className="text-white text-sm">Tarjeta</span>
+                      </button>
+
+                    </div>
+                    <div>
+                      <input
+                        type="radio"
+                        id="wallet"
+                        name="paymentMethod"
+                        value="wallet"
+                        checked={paymentMethod === "wallet"}
+                        onChange={() => setPaymentMethod("wallet")}
+                        className="sr-only"
+                      />
+                      <button
+                        onClick={() => setMetodoPago("wallet")}
+                        className={`flex flex-col items-center justify-between rounded-md border-2 px-4 py-3 cursor-pointer transition ${paymentMethod === "wallet" ? "border-[var(--principal)] bg-neutral-800" : "border-gray-500 bg-neutral-900 hover:bg-neutral-800 hover:border-[var(--principal)]"
+                          }`}
+                      >
+                        <Wallet className="mb-2 h-6 w-6 text-[var(--principal)]" />
+                        <span className="text-white text-sm">PayPal</span>
+                      </button>
+
+                    </div>
+                    <div>
+                      <input
+                        type="radio"
+                        id="transfer"
+                        name="paymentMethod"
+                        value="transfer"
+                        checked={paymentMethod === "transfer"}
+                        onChange={() => setPaymentMethod("transfer")}
+                        className="sr-only"
+                      />
+                      <button
+                        onClick={() => setMetodoPago("transfer")}
+                        className={`flex flex-col items-center justify-between rounded-md border-2 px-4 py-3 cursor-pointer transition ${paymentMethod === "transfer" ? "border-[var(--principal)] bg-neutral-800" : "border-gray-500 bg-neutral-900 hover:bg-neutral-800 hover:border-[var(--principal)]"
+                          }`}
+                      >
+                        <DollarSign className="mb-2 h-6 w-6 text-[var(--principal)]" />
+                        <span className="text-white text-sm">Transferencia</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </>
-            )}
-            <div className="mt-6 flex flex-col gap-2">
-              <Boton onClick={handlePagar} disabled={cargando}>
-                {cargando ? "Procesando..." : "Completar Pago"}
-              </Boton>
-              <Boton onClick={handleVolver} variante="outline" disabled={cargando}>
-                Volver
-              </Boton>
+
+                {paymentMethod === "card" && (
+                  <div className="space-y-4 mt-4 bg-[#1a1a1a] p-4 rounded-md border border-[#3a3a3a]">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-white font-medium">Detalles de la tarjeta</h3>
+                      <div className="flex gap-2">
+                        <div className="bg-gray-200 h-6 w-10 rounded"></div>
+                        <div className="bg-gray-200 h-6 w-10 rounded"></div>
+                        <div className="bg-gray-200 h-6 w-10 rounded"></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="cardName" className="block text-sm font-medium text-white">
+                        Titular de la tarjeta
+                      </label>
+                      <input
+                        id="cardName"
+                        type="text"
+                        placeholder="Nombre completo como aparece en la tarjeta"
+                        className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                      />
+                    </div>
+
+                    <div className="space-y-2 relative">
+                      <label htmlFor="cardNumber" className="block text-sm font-medium text-white">
+                        Número de tarjeta
+                      </label>
+                      <div className="relative">
+                        <input
+                          id="cardNumber"
+                          type={showCardNumber ? "text" : "password"}
+                          placeholder="1234 5678 9012 3456"
+                          maxLength={19}
+                          className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)] pl-10 pr-10"
+                          onChange={(e) => {
+                            e.target.value = formatCardNumber(e.target.value);
+                          }}
+                        />
+                        <CreditCardIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <button
+                          type="button"
+                          onClick={() => setShowCardNumber(!showCardNumber)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        >
+                          {showCardNumber ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2 col-span-1">
+                        <label htmlFor="expMonth" className="block text-sm font-medium text-white">
+                          Mes
+                        </label>
+                        <select
+                          id="expMonth"
+                          className="w-full p-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                        >
+                          <option value="">MM</option>
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <option key={i} value={String(i + 1).padStart(2, "0")}>{String(i + 1).padStart(2, "0")}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-2 col-span-1">
+                        <label htmlFor="expYear" className="block text-sm font-medium text-white">
+                          Año
+                        </label>
+                        <select
+                          id="expYear"
+                          className="w-full p-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                        >
+                          <option value="">AA</option>
+                          {Array.from({ length: 10 }, (_, i) => (
+                            <option key={i} value={String(new Date().getFullYear() + i).slice(-2)}>{String(new Date().getFullYear() + i).slice(-2)}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-2 col-span-1">
+                        <label htmlFor="cvv" className="block text-sm font-medium text-white">
+                          CVV
+                        </label>
+                        <input
+                          id="cvv"
+                          type="password"
+                          placeholder="123"
+                          maxLength={4}
+                          className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-4 text-gray-400 text-sm">
+                      <ShieldCheck className="h-4 w-4 mr-2 text-[var(--principal)]" />
+                      <span>Tus datos están protegidos con cifrado SSL de 256 bits</span>
+                    </div>
+                  </div>
+                )}
+
+
+                {paymentMethod === "wallet" && (
+                  <div className="p-4 rounded-md bg-[#1a1a1a] border border-[#3a3a3a] mt-4">
+                    <div className="flex items-center justify-center flex-col p-4">
+                      <div className="bg-blue-100 h-12 w-24 rounded mb-4"></div>
+                      <p className="text-gray-400 text-center mb-4">
+                        Serás redirigido a PayPal para completar tu pago de forma segura.
+                      </p>
+                      <Button className="bg-[#0070ba] text-white hover:bg-[#005ea6] w-full">
+                        Continuar a PayPal
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {paymentMethod === "transfer" && (
+                  <div className="p-4 rounded-md bg-[#1a1a1a] border border-[#3a3a3a] mt-4">
+                    <h3 className="text-white font-medium mb-2">Datos bancarios</h3>
+                    <div className="space-y-3 mt-4">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Banco:</span>
+                        <span className="text-white font-medium">Banco Santander</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Beneficiario:</span>
+                        <span className="text-white font-medium">Luxury Gold S.L.</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">IBAN:</span>
+                        <span className="text-white font-mono font-medium">ES91 2100 0418 4502 0005 1332</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">BIC/SWIFT:</span>
+                        <span className="text-white font-mono font-medium">BSCHESMMXXX</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Concepto:</span>
+                        <span className="text-white font-mono font-medium">
+                          ORD-{Math.floor(Math.random() * 1000000)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-[#252525] rounded border border-[#3a3a3a]">
+                      <p className="text-gray-400 text-sm">
+                        <strong className="text-[#cdaa7d]">Importante:</strong> Por favor incluya el número de
+                        referencia en el concepto de la transferencia. El procesamiento puede tardar 1-2 días hábiles.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className={step === "confirmation" ? "" : "hidden"}>
+              <div className="space-y-4 mt-0">
+                <div className="flex flex-col items-center justify-center p-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-[rgba(205,170,125,0.2)] flex items-center justify-center mb-4">
+                    <CheckCircle className="h-10 w-10 text-[#cdaa7d]" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">¡Pago completado con éxito!</h3>
+                  <p className="text-gray-400 mt-2 max-w-md">
+                    Gracias por su compra. Hemos enviado un correo electrónico con los detalles de su transacción a su
+                    dirección de correo.
+                  </p>
+
+                  <div className="w-full mt-8">
+                    <div className="bg-[#1a1a1a] border border-[#3a3a3a] rounded-md p-4 mb-4">
+                      <h4 className="text-white font-medium mb-2">Detalles de la transacción</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Fecha:</span>
+                          <span className="text-white">{new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Hora:</span>
+                          <span className="text-white">{new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Método de pago:</span>
+                          <span className="text-white">
+                            {paymentMethod === "card"
+                              ? "Tarjeta de crédito"
+                              : paymentMethod === "wallet"
+                                ? "PayPal"
+                                : "Transferencia bancaria"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Importe:</span>
+                          <span className="text-white font-medium">{orderDetails.total.toFixed(2)} €</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#1a1a1a] border border-[#3a3a3a] rounded-md p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-white font-medium">Número de referencia</h4>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-[#cdaa7d] text-[#14130f]">
+                          Guardado
+                        </span>
+                      </div>
+                      <div className="bg-[#252525] p-3 rounded border border-[#3a3a3a]">
+                        <p className="text-white font-mono text-center">
+                          TRX-{Math.random().toString(36).substring(2, 10).toUpperCase()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-[#3a3a3a] bg-[#14130f] text-white shadow-lg w-full lg:w-1/3">
+        <div className="rounded-t-lg border-b border-[#3a3a3a] p-4">
+          <h3 className="text-[#cdaa7d] text-2xl font-bold">Resumen de la compra</h3>
+        </div>
+        <div className="p-6 space-y-4">
+          {orderDetails.items.map((item, index) => (
+            <div key={index} className="flex justify-between items-center mb-2">
+              <span className="text-gray-400">{item.name}</span>
+              <span className="text-white font-medium">{(item.price * item.quantity).toFixed(2)} €</span>
+            </div>
+          ))}
+          <hr className={`border-t border-[#3a3a3a] my-4 ${className || ""}`} />
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-400">Subtotal</span>
+            <span className="text-white font-medium">{orderDetails.subtotal.toFixed(2)} €</span>
+          </div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-400">Envío</span>
+            <span className="text-white font-medium">{orderDetails.shipping.toFixed(2)} €</span>
+          </div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-400">Impuesto</span>
+            <span className="text-white font-medium">{orderDetails.tax.toFixed(2)} €</span>
+          </div>
+          <hr className={`border-t border-[#3a3a3a] my-4 ${className || ""}`} />
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-white font-bold">Total</span>
+            <span className="text-[#cdaa7d] font-bold">{orderDetails.total.toFixed(2)} €</span>
+          </div>
+        </div>
+        <div className="border-t border-[#3a3a3a] p-6 flex justify-between">
+          <Button variant="outline" className="w-full">
+            Ver detalles de la compra
+          </Button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Pago;

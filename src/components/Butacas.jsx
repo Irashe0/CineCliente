@@ -10,6 +10,9 @@ export default function Butacas() {
 
   const salaSeleccionada = localStorage.getItem("salaSeleccionada");
   const horarioSeleccionado = localStorage.getItem("horarioSeleccionado");
+  const selectedDate = localStorage.getItem("fechaSeleccionada");
+  const selectedPelicula = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
+  const horarioSeleccionadoObj = JSON.parse(localStorage.getItem("horarioSeleccionadoObj"));
 
   useEffect(() => {
     const fetchButacas = async () => {
@@ -40,10 +43,23 @@ export default function Butacas() {
 
   const handleContinuar = () => {
     if (selectedButacas.length > 0) {
-      localStorage.setItem("butacasSeleccionadas", JSON.stringify(selectedButacas));
-      navigate("/reserva/pago");
+      const butacasSeleccionadas = butacas
+        .filter((b) => selectedButacas.includes(b.id))
+        .map((b) => b.id); 
+  
+      const reserva = {
+        butacas: butacasSeleccionadas,
+        fecha: selectedDate,
+        horario: horarioSeleccionado,
+        sala: horarioSeleccionadoObj?.sala?.replace("Sala ", ""),
+        pelicula: selectedPelicula
+      };
+  
+      localStorage.setItem("reserva", JSON.stringify(reserva));
+      navigate(`/reserva/${selectedPelicula.id_pelicula}/pago`);
     }
   };
+  
 
   const handleVolver = () => {
     navigate("/reserva/horario");
@@ -57,8 +73,6 @@ export default function Butacas() {
     ["pasillo"], 
     [49, 50, 51, 52]
   ];
-  
-  
 
   return (
     <div className="space-y-6 p-6">
@@ -71,7 +85,6 @@ export default function Butacas() {
         <div className="w-full text-center text-[var(--texto-secundario)] font-medium border-b-4 pb-2 border-[var(--borde-suave)]">
           Pantalla
         </div>
-
 
         <div className="space-y-2">
           {filas.map((fila, rowIndex) => (
