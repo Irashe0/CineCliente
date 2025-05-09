@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Clock } from "lucide-react";
 import Boton from "../components/ComponentesExternos/Boton";
 
 export default function Horarios() {
@@ -20,13 +19,24 @@ export default function Horarios() {
 
   useEffect(() => {
     const peliculaId = localStorage.getItem("peliculaSeleccionadaId");
+    const peliculaNombre = localStorage.getItem("peliculaSeleccionadaNombre");
+  
+    console.log("peliculaId:", peliculaId);
+    console.log("peliculaNombre:", peliculaNombre);
+  
     if (peliculaId) {
-      setSelectedPelicula({ id_pelicula: peliculaId });
+      setSelectedPelicula({
+        id_pelicula: peliculaId,
+        nombre: peliculaNombre || "Nombre desconocido",  
+      });
     }
   }, []);
+  
 
   useEffect(() => {
-    if (!selectedPelicula || !fechaSeleccionadaDate) return;
+    if (!selectedPelicula || !selectedPelicula.id_pelicula) {
+      return;
+    }
 
     const fetchHorarios = async () => {
       try {
@@ -35,6 +45,13 @@ export default function Horarios() {
         const horariosData = await resHorarios.json();
 
         console.log("Horarios obtenidos:", horariosData);
+        if (!horariosData || horariosData.length === 0) {
+          setPeliculas([{
+            ...selectedPelicula,
+            horarios: ["No hay horarios disponibles"],
+          }]);
+          return;
+        }
 
         const horarios = horariosData
           .filter((h) => {
@@ -51,12 +68,12 @@ export default function Horarios() {
           }));
 
         console.log("Fecha seleccionada:", fechaSeleccionadaDate.toISOString().split("T")[0]);
+        console.log("Horarios filtrados:", horarios);
 
         setPeliculas([{
           ...selectedPelicula,
           horarios: horarios.length > 0 ? horarios : ["No hay horarios disponibles"],
         }]);
-
       } catch (err) {
         console.error("Error al cargar los horarios:", err);
       }
@@ -70,18 +87,17 @@ export default function Horarios() {
       const horarioSeleccionadoObj = peliculas
         .flatMap((p) => p.horarios)
         .find((h) => `${selectedPelicula.id_pelicula}-${h.hora}` === selectedHorario);
-  
+
       if (!horarioSeleccionadoObj) return;
-  
+
       localStorage.setItem("fechaSeleccionada", selectedDate);
       localStorage.setItem("horarioSeleccionado", selectedHorario);
       localStorage.setItem("salaSeleccionada", horarioSeleccionadoObj.sala.replace("Sala ", ""));
       localStorage.setItem("peliculaSeleccionada", JSON.stringify(selectedPelicula));
-  
+
       navigate(`/reserva/${selectedPelicula.id_pelicula}/butacas`);
     }
   };
-  
 
   const handleVolver = () => {
     navigate("/reserva/cine");
@@ -90,7 +106,7 @@ export default function Horarios() {
   return (
     <div className="space-y-6 p-6">
       <div className="text-center">
-        <h2>{selectedPelicula?.titulo}</h2>
+        <h2>{selectedPelicula?.nombre}</h2>
         <p className="text-sm text-gray-500 mt-2">
           Fecha seleccionada: {fechaSeleccionadaDate?.toLocaleDateString("es-ES")}
         </p>
@@ -101,9 +117,8 @@ export default function Horarios() {
             <button
               key={fecha.id}
               onClick={() => setSelectedDate(fecha.id)}
-              className={`flex flex-col items-center border rounded-lg py-2 ${
-                selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
-              }`}
+              className={`flex flex-col items-center border rounded-lg py-2 ${selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
+                }`}
             >
               <span className="font-medium">{fecha.label}</span>
               <span className="text-xs">{fecha.fecha.toLocaleDateString("es-ES")}</span>
@@ -114,7 +129,7 @@ export default function Horarios() {
         <div className="space-y-6">
           {peliculas.map((pelicula) => (
             <div key={pelicula.id_pelicula} className="border rounded-lg overflow-hidden p-4">
-              <h3 className="text-xl font-bold mb-4 text-center">{pelicula.titulo}</h3>
+              <h3 className="text-xl font-bold mb-4 text-center">{pelicula.nombre}</h3>
 
               <div className="grid grid-cols-2 gap-4">
                 {pelicula.horarios.length > 0 && pelicula.horarios[0] !== "No hay horarios disponibles" ? (
@@ -127,9 +142,8 @@ export default function Horarios() {
                           setSelectedHorario(horarioKey);
                           setSelectedPelicula(pelicula);
                         }}
-                        className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${
-                          selectedHorario === horarioKey ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
-                        }`}
+                        className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${selectedHorario === horarioKey ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
+                          }`}
                       >
                         <span>{horarioObj.hora}</span>
                         <span className="text-gray-500">{horarioObj.sala}</span>

@@ -12,9 +12,13 @@ export default function Butacas() {
   const horarioSeleccionado = localStorage.getItem("horarioSeleccionado");
   const selectedDate = localStorage.getItem("fechaSeleccionada");
   const selectedPelicula = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
-  const horarioSeleccionadoObj = JSON.parse(localStorage.getItem("horarioSeleccionadoObj"));
 
   useEffect(() => {
+    console.log("Sala seleccionada:", salaSeleccionada);
+    console.log("Horario seleccionado:", horarioSeleccionado);
+    console.log("Fecha seleccionada:", selectedDate);
+    console.log("Película seleccionada:", selectedPelicula);
+
     const fetchButacas = async () => {
       try {
         const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
@@ -33,46 +37,67 @@ export default function Butacas() {
     }
   }, [salaSeleccionada]);
 
+  useEffect(() => {
+    if (selectedPelicula) {
+      localStorage.setItem("peliculaSeleccionada", JSON.stringify({
+        id_pelicula: selectedPelicula.id_pelicula,
+        titulo: selectedPelicula.nombre,
+      }));
+    }
+  }, [selectedPelicula]);
+
   const toggleSeleccionButaca = (butacaId) => {
-    setSelectedButacas((prev) =>
-      prev.includes(butacaId)
-        ? prev.filter((id) => id !== butacaId)
-        : [...prev, butacaId]
+    const updatedSelectedButacas = selectedButacas.includes(butacaId)
+      ? selectedButacas.filter((id) => id !== butacaId)
+      : [...selectedButacas, butacaId];
+
+    setSelectedButacas(updatedSelectedButacas);
+
+    const updatedButacas = butacas.map((butaca) =>
+      butaca.id_butaca === butacaId ? { ...butaca, estado: "Reservada" } : butaca
     );
+    setButacas(updatedButacas);
   };
 
   const handleContinuar = () => {
     if (selectedButacas.length > 0) {
       const butacasSeleccionadas = butacas
-        .filter((b) => selectedButacas.includes(b.id))
-        .map((b) => b.id); 
-  
+        .filter((b) => selectedButacas.includes(b.id_butaca))
+        .map((b) => ({ id_butaca: b.id_butaca, fila: b.fila, numero: b.numero }));
+
       const reserva = {
         butacas: butacasSeleccionadas,
         fecha: selectedDate,
         horario: horarioSeleccionado,
-        sala: horarioSeleccionadoObj?.sala?.replace("Sala ", ""),
-        pelicula: selectedPelicula
+        sala: salaSeleccionada?.sala?.replace("Sala ", ""),
+        pelicula: selectedPelicula?.nombre,
       };
-  
+
+      console.log("Reserva:", reserva);
       localStorage.setItem("reserva", JSON.stringify(reserva));
-      navigate(`/reserva/${selectedPelicula.id_pelicula}/pago`);
+      navigate(`/reserva/${selectedPelicula?.id_pelicula}/pago`);
     }
   };
-  
 
   const handleVolver = () => {
     navigate("/reserva/horario");
   };
 
-  const filas = [
-    [1, 2, 3, 4, 5, 6, "pasillo", 7, 8, 9, 10, 11, 12], 
-    [13, 14, 15, 16, 17, 18, "pasillo", 19, 20, 21, 22, 23, 24], 
-    [25, 26, 27, 28, 29, 30, "pasillo", 31, 32, 33, 34, 35, 36], 
-    [37, 38, 39, 40, 41, 42, "pasillo", 43, 44, 45, 46, 47, 48], 
-    ["pasillo"], 
-    [49, 50, 51, 52]
-  ];
+  const filas = [];
+  const filaMapping = { "A": 1, "B": 2, "C": 3, "D": 4, "E": 5 };
+
+  butacas.forEach((butaca) => {
+    const filaIndex = filaMapping[butaca.fila];
+    if (filaIndex) {
+      if (!filas[filaIndex - 1]) {
+        filas[filaIndex - 1] = [];
+      }
+      filas[filaIndex - 1].push(butaca);
+    } else {
+      console.error(`Error: fila inválida en butaca`, butaca);
+    }
+  });
+  console.log("Filas generadas:", filas);
 
   return (
     <div className="space-y-6 p-6">
@@ -89,29 +114,25 @@ export default function Butacas() {
         <div className="space-y-2">
           {filas.map((fila, rowIndex) => (
             <div key={rowIndex} className="flex justify-center gap-3">
-              {fila.map((butacaId, idx) =>
-                butacaId === "pasillo" ? (
-                  <div key={`pasillo-${rowIndex}-${idx}`} className="w-6"></div>
-                ) : (
-                  <button
-                    key={butacaId}
-                    onClick={() => toggleSeleccionButaca(butacaId)}
-                    className="flex justify-center items-center p-2 rounded border border-[var(--borde-suave)]"
-                    disabled={butacas.some((b) => b.id === butacaId && b.ocupada)}
-                  >
-                    <Armchair
-                      className="h-6 w-6"
-                      color={
-                        selectedButacas.includes(butacaId)
-                          ? "var(--principal)"
-                          : butacas.some((b) => b.id === butacaId && b.ocupada)
-                            ? "var(--gris-oscuro)"
-                            : "var(--texto-primario)"
-                      }
-                    />
-                  </button>
-                )
-              )}
+              {fila.map((butaca) => (
+                <button
+                  key={butaca.id_butaca}
+                  onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
+                  className="flex justify-center items-center p-2 rounded border border-[var(--borde-suave)]"
+                  disabled={butaca.estado === "Ocupada"}
+                >
+                  <Armchair
+                    className="h-6 w-6"
+                    color={
+                      selectedButacas.includes(butaca.id_butaca)
+                        ? "#CDAA7D"
+                        : butaca.estado === "Ocupada"
+                          ? "#2D2D2D"
+                          : "#EDE6D6"
+                    }
+                  />
+                </button>
+              ))}
             </div>
           ))}
         </div>
