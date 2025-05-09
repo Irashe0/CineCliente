@@ -67,13 +67,21 @@ export default function Horarios() {
 
   const handleContinuar = () => {
     if (selectedHorario && selectedPelicula) {
+      const horarioSeleccionadoObj = peliculas
+        .flatMap((p) => p.horarios)
+        .find((h) => `${selectedPelicula.id_pelicula}-${h.hora}` === selectedHorario);
+  
+      if (!horarioSeleccionadoObj) return;
+  
       localStorage.setItem("fechaSeleccionada", selectedDate);
       localStorage.setItem("horarioSeleccionado", selectedHorario);
+      localStorage.setItem("salaSeleccionada", horarioSeleccionadoObj.sala.replace("Sala ", ""));
       localStorage.setItem("peliculaSeleccionada", JSON.stringify(selectedPelicula));
-
+  
       navigate(`/reserva/${selectedPelicula.id_pelicula}/butacas`);
     }
   };
+  
 
   const handleVolver = () => {
     navigate("/reserva/cine");

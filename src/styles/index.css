@@ -4,26 +4,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap');
 
 :root {
-  --principal: #CDAA7D;
-  --blanco-traslúcido: #F8F8FF;
-  --gris-pizarra-claro: #778899;
-  --lavanda-suave: #EDEDFF;
-  --gris-oscuro: #2D2D2D;
-  --texto-principal-rgb: 0, 0, 0;
-  --fondo-inicio-rgb: 214, 219, 220;
-  --fondo-fin-rgb: 255, 255, 255;
+  --principal: #CDAA7D; 
+  --gris-oscuro: #2D2D2D; 
   
-  --fondo-oscuro: #2D2D2D;
-  --fondo-claro: #FFFFFF;
-  --texto-oscuro: #2D2D2D;
-  --texto-claro: #FFFFFF;
-  --fondo-hover: rgba(255, 215, 0, 0.2);
-  --fondo-boton: var(--principal);
-  --fondo-boton-hover: #E1B900;
-  --color-borde: #777777;
-  --sombra-tarjeta: rgba(0, 0, 0, 0.15);
-  --sombra-hover-tarjeta: rgba(0, 0, 0, 0.25);
+  --background: linear-gradient(to right, #14130f, #82642b, #14130f); 
+  --texto-primario: #EDE6D6; 
+  --texto-secundario: #C4A984; 
+  
+  --borde-suave: rgba(255, 255, 255, 0.2); 
+  --hover-efecto: rgba(205, 170, 125, 0.4); 
+  
 }
+
 
 
 @media (prefers-color-scheme: dark) {
@@ -41,7 +33,7 @@
 body {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 1.2rem;
-  background: linear-gradient(to right, #1A1A2E, #82642b, #1A1A2E);
+  background: linear-gradient(to right, #14130f, #82642b, #14130f);
   color: rgb(var(--foreground-rgb));
   line-height: 1.6;
   margin: 0;
