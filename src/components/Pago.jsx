@@ -18,7 +18,6 @@ const Pago = () => {
   const precioEntrada = 8;
   const total = butacasSeleccionadas.length * precioEntrada;
 
-
   const API_BASE = import.meta.env.VITE_API_URL;
 
   const handleCompra = async () => {
@@ -26,33 +25,30 @@ const Pago = () => {
       const reservaData = JSON.parse(localStorage.getItem("reserva"));
       const user = JSON.parse(localStorage.getItem("user"));
 
-      // 🔹 1️⃣ Validaciones iniciales
       if (!reservaData || !reservaData.pelicula || !reservaData.horario || !reservaData.id_horario || !reservaData.butacas.length) {
         console.error("Error: Datos insuficientes para realizar la compra.");
         return;
       }
-console.log("Datos de reserva:", reservaData);
-console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem("reserva")));
+      console.log("Datos de reserva:", reservaData);
+      console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem("reserva")));
 
       if (!user?.id || !localStorage.getItem("token")) {
         console.error("Error: Usuario no autenticado.");
         return;
       }
 
-      const API_BASE = import.meta.env.VITE_API_URL;
-
       console.log("Datos enviados en la reserva:", {
         id_user: user.id,
         id_horario: reservaData.id_horario,
       });
 
-      // 🔹 2️⃣ Guardar la reserva en la tabla `reservas`
+      // Registrar la reserva
       const reservaResponse = await fetch(`${API_BASE}/reservas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify({
           id_user: user.id,
-          id_horario: reservaData.id_horario
+          id_horario: reservaData.id_horario,
         }),
       });
 
@@ -64,7 +60,8 @@ console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem
       const nuevaReserva = await reservaResponse.json();
       console.log("Reserva creada correctamente:", nuevaReserva.reserva);
 
-      // 🔹 3️⃣ Guardar la venta en la tabla `ventas`
+      // Registrar las ventas de las butacas
+      let ventasExitosas = true; // Flag para saber si todas las ventas fueron exitosas
       await Promise.all(
         reservaData.butacas.map(async (butaca) => {
           const ventaResponse = await fetch(`${API_BASE}/ventas`, {
@@ -73,19 +70,26 @@ console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem
             body: JSON.stringify({
               id_reserva: nuevaReserva.reserva.id,
               id_butaca: butaca.id_butaca,
-              total: reservaData.butacas.length * 8
+              total: reservaData.butacas.length * precioEntrada,
             }),
           });
 
           if (!ventaResponse.ok) {
             console.error(`Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+            ventasExitosas = false;
           }
         })
       );
 
-      console.log("Todas las ventas han sido registradas correctamente.");
+      if (ventasExitosas) {
+        console.log("Todas las ventas han sido registradas correctamente.");
+      } else {
+        console.error("Algunas ventas no fueron registradas correctamente.");
+        return; // Detener el proceso si alguna venta falla
+      }
 
-      // 🔹 4️⃣ Cambiar el estado de las butacas a `ocupada`
+      // Actualizar las butacas como 'ocupadas'
+      let actualizacionesExitosas = true;
       await Promise.all(
         reservaData.butacas.map(async (butaca) => {
           const updateButacaResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
@@ -96,24 +100,28 @@ console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem
 
           if (!updateButacaResponse.ok) {
             console.error(`Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
+            actualizacionesExitosas = false;
           }
         })
       );
 
-      console.log("Todas las butacas han sido marcadas como 'ocupada'.");
+      if (actualizacionesExitosas) {
+        console.log("Todas las butacas han sido marcadas como 'ocupada'.");
+      } else {
+        console.error("Algunas butacas no fueron actualizadas correctamente.");
+        return; // Detener el proceso si alguna actualización de butaca falla
+      }
 
-      // 🔹 5️⃣ Borrar los datos de `localStorage`
+      // Eliminar solo los datos de la compra
       localStorage.removeItem("reserva");
-      localStorage.removeItem("user");
 
-      // 🔹 6️⃣ Redirigir a la página de confirmación
+      // Redirigir a la página de confirmación
       navigate("/confirmacion-compra");
 
     } catch (error) {
       console.error("Error en el proceso de compra:", error);
     }
   };
-
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
@@ -256,109 +264,23 @@ console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem
                             onInput={(e) => e.target.value = e.target.value.replace(/\D/g, "").slice(0, 16)}
                           />
                           <CreditCardIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                          <button
-                            type="button"
+                          <button type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                             onClick={() => setShowCardNumber(!showCardNumber)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2"
                           >
-                            {showCardNumber ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                            {showCardNumber ? <EyeOff /> : <Eye />}
                           </button>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-2 col-span-1">
-                          <label htmlFor="expMonth" className="block text-sm font-medium text-white">Mes</label>
-                          <select
-                            id="expMonth"
-                            className="w-full p-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
-                            required
-                          >
-                            <option value="">MM</option>
-                            {Array.from({ length: 12 }, (_, i) => (
-                              <option key={i} value={String(i + 1).padStart(2, "0")}>{String(i + 1).padStart(2, "0")}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="space-y-2 col-span-1">
-                          <label htmlFor="expYear" className="block text-sm font-medium text-white">Año</label>
-                          <select
-                            id="expYear"
-                            className="w-full p-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
-                            required
-                          >
-                            <option value="">AA</option>
-                            {Array.from({ length: 10 }, (_, i) => (
-                              <option key={i} value={String(new Date().getFullYear() + i).slice(-2)}>{String(new Date().getFullYear() + i).slice(-2)}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="space-y-2 col-span-1">
-                          <label htmlFor="cvv" className="block text-sm font-medium text-white">CVV</label>
-                          <input
-                            id="cvv"
-                            type="password"
-                            placeholder="123"
-                            maxLength={3}
-                            className="w-full px-3 py-2 border rounded-md bg-neutral-800 border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-[var(--principal)]"
-                            pattern="[0-9]{3}"
-                            required
-                            onInput={(e) => e.target.value = e.target.value.replace(/\D/g, "").slice(0, 3)}
-                          />
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <Button onClick={handleCompra} title="Realizar compra" />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Resumen de compra */}
-      <div className="rounded-lg border border-[#3a3a3a] bg-[#14130f] text-white shadow-lg w-full md:w-1/3 self-start">
-        <div className="rounded-t-lg border-b border-[#3a3a3a] p-4">
-          <h3 className="text-[#cdaa7d] text-3xl font-bold text-center">Resumen de la compra</h3>
-        </div>
-        <div className="p-6 space-y-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-400">Pelicula</span>
-            <span className="text-white font-medium">{selectedPelicula?.titulo ?? 'No disponible'}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-400">Fecha</span>
-            <span className="text-white font-medium">{reserva?.fecha || 'No disponible'}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-400">Horario</span>
-            <span className="text-white font-medium">{horarioSeleccionado || 'No disponible'}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-400">Sala</span>
-            <span className="text-white font-medium">{salaSeleccionada}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-400">Butacas</span>
-            <div className="text-white">
-              {butacasSeleccionadas?.map((butaca) => (
-                <span key={butaca.id_butaca} className="mr-2">{butaca.fila} {butaca.numero}</span>
-              ))}
-            </div>
-          </div>
-          <hr className="border-t border-[#3a3a3a] my-4" />
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-white font-bold">Total</span>
-            <span className="text-[#cdaa7d] font-bold">{total.toFixed(2)} €</span>
-          </div>
-        </div>
-        <div className="border-t border-[#3a3a3a] p-6 flex justify-center">
-          <Button variant="outline" className="w-full max-w-xs" onClick={handleCompra}>
-            Comprar
-          </Button>
         </div>
       </div>
     </div>
   );
 };
-
-export default Pago;
