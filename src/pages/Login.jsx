@@ -18,7 +18,6 @@ export default function Login() {
     setError("");
   
     try {
-      // Paso 1: Hacer la petición de login
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,10 +30,8 @@ export default function Login() {
   
       console.log("Login exitoso:", data);
   
-      // Guardamos el token en el localStorage
       localStorage.setItem("token", data.token);
   
-      // Paso 2: Obtenemos los datos del usuario autenticado
       const userResponse = await fetch(`${API_URL}/user`, {
         method: "GET",
         headers: { "Authorization": `Bearer ${data.token}` },
@@ -43,7 +40,6 @@ export default function Login() {
       const userData = await userResponse.json();
   
       if (userResponse.ok) {
-        // Guardamos los datos del usuario en el localStorage
         localStorage.setItem("user", JSON.stringify({
           id: userData.id,
           name: userData.name,

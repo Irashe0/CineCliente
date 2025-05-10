@@ -9,7 +9,9 @@ export default function Butacas() {
   const [selectedButacas, setSelectedButacas] = useState([]);
 
   const reserva = JSON.parse(localStorage.getItem("reserva")) || {};
-  const { sala, horario, fecha, pelicula } = reserva;
+  const { sala, horario, pelicula } = reserva;
+
+  const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api"; // 🔒 URL Base de la API
 
   useEffect(() => {
     if (pelicula?.id_pelicula && !pelicula?.titulo) {
@@ -25,20 +27,18 @@ export default function Butacas() {
   }, [pelicula]);
 
   useEffect(() => {
-    if (sala) {
-      const fetchButacas = async () => {
-        try {
-          const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
-          const resButacas = await fetch(`${API_BASE}/butacas/sala/${sala}`);
-          const butacasData = await resButacas.json();
-          setButacas(butacasData);
-        } catch (err) {
-          console.error("Error al cargar las butacas:", err);
-        }
-      };
+    const fetchButacas = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/butacas/sala/${sala}`);
+        if (!res.ok) throw new Error("Error al obtener butacas");
+        const data = await res.json();
+        setButacas(data);
+      } catch (err) {
+        console.error("Error al cargar las butacas:", err);
+      }
+    };
 
-      fetchButacas();
-    }
+    if (sala) fetchButacas();
   }, [sala]);
 
   const toggleSeleccionButaca = (id) => {
@@ -47,36 +47,57 @@ export default function Butacas() {
     );
   };
 
-  const handleContinuar = () => {
-    if (selectedButacas.length > 0) {
+  const handleContinuar = async () => {
+    if (selectedButacas.length === 0) {
+      alert("Selecciona al menos una butaca.");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedButacas.map(async (id_butaca) => {
+          const res = await fetch(`${API_BASE}/butacas/${id_butaca}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("token")}`,
+              "X-Requested-With": "XMLHttpRequest",
+            },
+            body: JSON.stringify({ estado: "Reservada" }),
+          });
+
+          const responseData = await res.json();
+          console.log("Detalles del error:", responseData?.detalles);
+
+
+          if (!res.ok) throw new Error(`Error al reservar butaca ${id_butaca}: ${JSON.stringify(responseData.detalles)}`);
+        })
+      );
+
+
       const butacasSeleccionadas = butacas
         .filter((b) => selectedButacas.includes(b.id_butaca))
-        .map((b) => ({ id_butaca: b.id_butaca, fila: b.fila, numero: b.numero }));
+        .map(({ id_butaca, fila, numero }) => ({ id_butaca, fila, numero }));
 
-      const updatedReserva = {
-        ...reserva,
-        butacas: butacasSeleccionadas,
-      };
-
+      const updatedReserva = { ...reserva, butacas: butacasSeleccionadas };
       localStorage.setItem("reserva", JSON.stringify(updatedReserva));
       navigate(`/reserva/${pelicula?.id_pelicula}/pago`);
+    } catch (err) {
+      console.error("Error durante la reserva de butacas:", err);
+      alert("Ocurrió un error al reservar las butacas. Intenta de nuevo.");
     }
   };
 
-  const handleVolver = () => {
-    navigate("/reserva/horario");
-  };
+  const handleVolver = () => navigate("/reserva/horario");
 
   const filas = [];
-  const filaMapping = { A: 1, B: 2, C: 3, D: 4, E: 5 };
+  const filaMapping = { A: 0, B: 1, C: 2, D: 3, E: 4 };
 
   butacas.forEach((butaca) => {
-    const filaIndex = filaMapping[butaca.fila];
-    if (filaIndex) {
-      if (!filas[filaIndex - 1]) filas[filaIndex - 1] = [];
-      filas[filaIndex - 1].push(butaca);
-    } else {
-      console.error(`Fila inválida:`, butaca);
+    const index = filaMapping[butaca.fila];
+    if (index !== undefined) {
+      if (!filas[index]) filas[index] = [];
+      filas[index].push(butaca);
     }
   });
 
@@ -87,15 +108,14 @@ export default function Butacas() {
         Sala: <strong>{sala}</strong> | Horario: <strong>{horario}</strong>
       </p>
 
-
       <div className="rounded-xl p-4 space-y-4 bg-[var(--gris-oscuro)]">
         <div className="w-full text-center text-[var(--texto-secundario)] font-medium border-b-4 pb-2 border-[var(--borde-suave)]">
           Pantalla
         </div>
 
         <div className="space-y-2">
-          {filas.map((fila, rowIndex) => (
-            <div key={rowIndex} className="flex justify-center gap-3">
+          {filas.map((fila, i) => (
+            <div key={i} className="flex justify-center gap-3">
               {fila.map((butaca) => (
                 <button
                   key={butaca.id_butaca}
@@ -107,12 +127,15 @@ export default function Butacas() {
                     className="h-6 w-6"
                     color={
                       selectedButacas.includes(butaca.id_butaca)
-                        ? "#CDAA7D"
+                        ? "#CDAA7D" 
                         : butaca.estado === "Ocupada"
-                          ? "#2D2D2D"
-                          : "#EDE6D6"
+                          ? "#FF4D4D" 
+                          : butaca.estado === "Reservada"
+                            ? "#FFA500" 
+                            : "#EDE6D6" 
                     }
                   />
+
                 </button>
               ))}
             </div>
