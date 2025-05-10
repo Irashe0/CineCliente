@@ -3,14 +3,12 @@ import CinesCard from "./CineCardReserva";
 
 export default function SelectCine() {
   const [cines, setCines] = useState([]);
-  const [peliculaSeleccionada, setPeliculaSeleccionada] = useState(null); // ✅ Estado para la película seleccionada
+  const [peliculaSeleccionada, setPeliculaSeleccionada] = useState(null); 
 
   useEffect(() => {
-    // Recuperar la película desde localStorage
     const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada")) || null;
     setPeliculaSeleccionada(peliculaGuardada);
 
-    // Obtener la lista de cines
     const fetchCines = async () => {
       try {
         const res = await fetch("https://laravelcine-cine-zeocca.laravel.cloud/api/cines");
@@ -20,7 +18,6 @@ export default function SelectCine() {
         console.error("Error al obtener la lista de cines:", err);
       }
     };
-
     fetchCines();
   }, []);
 

@@ -18,13 +18,12 @@ export default function Horarios() {
   const fechaSeleccionadaDate = fechas.find((f) => f.id === selectedDate)?.fecha;
 
   useEffect(() => {
-    const reservaGuardada = JSON.parse(localStorage.getItem("reserva"));
-    const peliculaGuardada = reservaGuardada?.pelicula;
+    const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
 
     if (peliculaGuardada) {
       setSelectedPelicula({
-        id_pelicula: peliculaGuardada.id_pelicula,
-        titulo: peliculaGuardada.titulo ?? "Nombre desconocido",
+        id_pelicula: peliculaGuardada?.id_pelicula,
+        titulo: peliculaGuardada?.titulo ?? "Nombre desconocido",
       });
     }
   }, []);
@@ -38,21 +37,26 @@ export default function Horarios() {
         const resHorarios = await fetch(`${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`);
         const horariosData = await resHorarios.json();
 
-        const horarios = horariosData?.length > 0
-          ? horariosData.filter((h) => {
-            const horarioDate = new Date(h.fecha_hora);
-            return (
-              horarioDate.getUTCFullYear() === fechaSeleccionadaDate.getUTCFullYear() &&
-              horarioDate.getUTCMonth() === fechaSeleccionadaDate.getUTCMonth() &&
-              horarioDate.getUTCDate() === fechaSeleccionadaDate.getUTCDate()
-            );
-          }).map((h) => ({
-            hora: h.fecha_hora.split("T")[1].slice(0, 5),
-            sala: `Sala ${h.id_sala}`,
-          }))
-          : ["No hay horarios disponibles"];
+        const ahora = new Date();
+        const fechaSeleccionada = new Date(fechaSeleccionadaDate);
+        fechaSeleccionada.setHours(0, 0, 0, 0);
+        const horariosFiltrados = horariosData?.filter((h) => {
+          const horarioDate = new Date(h.fecha_hora);
+          const esElDiaSeleccionado = horarioDate >= fechaSeleccionada && horarioDate.toDateString() === fechaSeleccionada.toDateString();
+          const esPosteriorALaHoraActual = horarioDate > ahora;
 
-        setPeliculas([{ ...selectedPelicula, horarios }]);
+          return esElDiaSeleccionado && esPosteriorALaHoraActual;
+        }).map((h) => ({
+          hora: h.fecha_hora.split("T")[1].slice(0, 5),
+          sala: `Sala ${h.id_sala}`,
+          id_horario: h.id_horario, // Aseguramos de incluir el id_horario desde la API
+        })) || [];
+
+        if (horariosFiltrados.length === 0) {
+          setPeliculas([{ ...selectedPelicula, horarios: [] }]);
+        } else {
+          setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
+        }
       } catch (err) {
         console.error("Error al cargar los horarios:", err);
       }
@@ -62,46 +66,43 @@ export default function Horarios() {
   }, [selectedPelicula, selectedDate]);
 
   const handleContinuar = () => {
-    if (selectedHorario && selectedPelicula) {
-      const horarioSeleccionadoObj = peliculas
-        .flatMap((p) => p.horarios)
-        .find((h) => `${selectedPelicula.id_pelicula}-${h.hora}` === selectedHorario);
-
-      if (!horarioSeleccionadoObj) return;
-
-      const reserva = {
-        fecha: selectedDate,
-        horario: selectedHorario,
-        sala: horarioSeleccionadoObj.sala.replace("Sala ", ""),
-        pelicula: {
-          id_pelicula: selectedPelicula.id_pelicula,
-          titulo: selectedPelicula.titulo ?? "No disponible",
-        },
-        butacas: []
-      };
-
-      localStorage.setItem("reserva", JSON.stringify(reserva));
-      navigate(`/reserva/${selectedPelicula.id_pelicula}/butacas`);
+    if (!selectedHorario || !selectedPelicula) {
+      console.error("Error: No hay horario o película seleccionada.");
+      return;
     }
+
+    // 🔹 Accede a los horarios dentro de `peliculas[0]`
+    const horarioSeleccionadoObj = peliculas[0].horarios.find((h) => h.hora === selectedHorario.hora);
+
+    if (!horarioSeleccionadoObj) {
+      console.error("Error: No se encontró el horario seleccionado.");
+      return;
+    }
+
+    const reserva = {
+      fecha: selectedDate,
+      horario: selectedHorario.hora,
+      id_horario: horarioSeleccionadoObj.id_horario, // Guardamos el id_horario
+      sala: horarioSeleccionadoObj.sala.replace("Sala ", ""),
+      pelicula: {
+        id_pelicula: selectedPelicula.id_pelicula, 
+        titulo: selectedPelicula.titulo, 
+      },
+    };
+
+    console.log("Reserva guardada en localStorage:", reserva);
+    localStorage.setItem("reserva", JSON.stringify(reserva));
+    navigate(`/reserva/${selectedPelicula.id_pelicula}/butacas`);
   };
 
   return (
     <div className="space-y-6 p-6">
-      <div className="text-center">
-        <h2>{selectedPelicula?.titulo}</h2>
-        <p className="text-sm text-gray-500 mt-2">
-          Fecha seleccionada: {fechaSeleccionadaDate?.toLocaleDateString("es-ES")}
-        </p>
-      </div>
-
-      {/* Botones de selección de fecha */}
       <div className="grid grid-cols-3 gap-2 mb-6">
         {fechas.map((fecha) => (
           <button
             key={fecha.id}
             onClick={() => setSelectedDate(fecha.id)}
-            className={`flex flex-col items-center border rounded-lg py-2 ${selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
-              }`}
+            className={`flex flex-col items-center border rounded-lg py-2 ${selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"}`}
           >
             <span className="font-medium">{fecha.label}</span>
             <span className="text-xs">{fecha.fecha.toLocaleDateString("es-ES")}</span>
@@ -109,36 +110,33 @@ export default function Horarios() {
         ))}
       </div>
 
-      {/* Lista de horarios */}
       <div className="space-y-6">
-        {peliculas.map((pelicula) => (
-          <div key={pelicula.id_pelicula} className="border rounded-lg overflow-hidden p-4">
-            <h3 className="text-xl font-bold mb-4 text-center">{pelicula.titulo}</h3>
+        {/* Solo mostrar los horarios si existen disponibles */}
+        {selectedPelicula && peliculas.length > 0 && peliculas[0].horarios.length > 0 ? (
+          <div key={peliculas[0].id_pelicula} className="border rounded-lg overflow-hidden p-4">
+            <h3 className="text-xl font-bold mb-4 text-center">{peliculas[0].titulo}</h3>
 
             <div className="grid grid-cols-2 gap-4">
-              {pelicula.horarios.length > 0 && pelicula.horarios[0] !== "No hay horarios disponibles"
-                ? pelicula.horarios.map((horarioObj) => {
-                  const horarioKey = `${pelicula.id_pelicula}-${horarioObj.hora}`;
-                  return (
-                    <button
-                      key={horarioKey}
-                      onClick={() => {
-                        setSelectedHorario(horarioKey);
-                        setSelectedPelicula(pelicula);
-                      }}
-                      className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${selectedHorario === horarioKey ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
-                        }`}
-                    >
-                      <span>{horarioObj.hora}</span>
-                      <span className="text-gray-500">{horarioObj.sala}</span>
-                    </button>
-                  );
-                })
-                : <span className="text-gray-400 text-lg">No hay horarios disponibles</span>
-              }
+              {peliculas[0].horarios.map((horarioObj) => {
+                const horarioKey = `${peliculas[0].id_pelicula}-${horarioObj.sala}-${horarioObj.hora}`;
+                return (
+                  <button
+                    key={horarioKey}
+                    onClick={() => {
+                      setSelectedHorario(horarioObj); // Guardamos el objeto completo del horario
+                    }}
+                    className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${selectedHorario?.hora === horarioObj.hora ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"}`}
+                  >
+                    <span>{horarioObj.hora}</span>
+                    <span className="text-gray-500">{horarioObj.sala}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
-        ))}
+        ) : (
+          <span className="text-gray-400 text-lg">No hay horarios disponibles</span>
+        )}
       </div>
 
       {/* Botones de acción */}

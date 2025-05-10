@@ -24,12 +24,16 @@ const Pago = () => {
   const handleCompra = async () => {
     try {
       const reservaData = JSON.parse(localStorage.getItem("reserva"));
-      if (!reservaData || !reservaData.pelicula || !reservaData.horario || !reservaData.butacas) {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      // 🔹 1️⃣ Validaciones iniciales
+      if (!reservaData || !reservaData.pelicula || !reservaData.horario || !reservaData.id_horario || !reservaData.butacas.length) {
         console.error("Error: Datos insuficientes para realizar la compra.");
         return;
       }
+console.log("Datos de reserva:", reservaData);
+console.log("Contenido actual de localStorage:", JSON.parse(localStorage.getItem("reserva")));
 
-      const user = JSON.parse(localStorage.getItem("user"));
       if (!user?.id || !localStorage.getItem("token")) {
         console.error("Error: Usuario no autenticado.");
         return;
@@ -37,44 +41,80 @@ const Pago = () => {
 
       const API_BASE = import.meta.env.VITE_API_URL;
 
-      const ventaResponse = await fetch(`${API_BASE}/ventas`, {
+      console.log("Datos enviados en la reserva:", {
+        id_user: user.id,
+        id_horario: reservaData.id_horario,
+      });
+
+      // 🔹 2️⃣ Guardar la reserva en la tabla `reservas`
+      const reservaResponse = await fetch(`${API_BASE}/reservas`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify({
-          id_reserva: reservaData.reserva.id,
-          id_butaca: reservaData.butacas.id_butaca,
-          total: reservaData.butacas.length * 8 
+          id_user: user.id,
+          id_horario: reservaData.id_horario
         }),
       });
 
-      if (!ventaResponse.ok) {
-        console.error("Error al registrar la venta.");
+      if (!reservaResponse.ok) {
+        console.error("Error al registrar la reserva.");
         return;
       }
 
-      console.log("Venta registrada correctamente.");
+      const nuevaReserva = await reservaResponse.json();
+      console.log("Reserva creada correctamente:", nuevaReserva.reserva);
 
+      // 🔹 3️⃣ Guardar la venta en la tabla `ventas`
       await Promise.all(
         reservaData.butacas.map(async (butaca) => {
-          await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
-            method: "PUT",
+          const ventaResponse = await fetch(`${API_BASE}/ventas`, {
+            method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
             body: JSON.stringify({
-              estado: "ocupada"
+              id_reserva: nuevaReserva.reserva.id,
+              id_butaca: butaca.id_butaca,
+              total: reservaData.butacas.length * 8
             }),
           });
+
+          if (!ventaResponse.ok) {
+            console.error(`Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+          }
+        })
+      );
+
+      console.log("Todas las ventas han sido registradas correctamente.");
+
+      // 🔹 4️⃣ Cambiar el estado de las butacas a `ocupada`
+      await Promise.all(
+        reservaData.butacas.map(async (butaca) => {
+          const updateButacaResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+            body: JSON.stringify({ estado: "ocupada" }),
+          });
+
+          if (!updateButacaResponse.ok) {
+            console.error(`Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
+          }
         })
       );
 
       console.log("Todas las butacas han sido marcadas como 'ocupada'.");
 
-      localStorage.clear();
+      // 🔹 5️⃣ Borrar los datos de `localStorage`
+      localStorage.removeItem("reserva");
+      localStorage.removeItem("user");
+
+      // 🔹 6️⃣ Redirigir a la página de confirmación
       navigate("/confirmacion-compra");
 
     } catch (error) {
       console.error("Error en el proceso de compra:", error);
     }
   };
+
+
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
       <div className="w-full md:w-2/3 mb-6 md:mb-0">
