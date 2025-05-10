@@ -13,7 +13,7 @@ const Pago = () => {
   console.log("Reserva:", reserva);
   const selectedPelicula = reserva?.pelicula || {};
   const horarioSeleccionado = reserva?.horario;
-  const salaSeleccionada = selectedPelicula?.horarios?.[0]?.sala || 'No disponible';
+  const salaSeleccionada = reserva?.sala || 'No disponible';
   const butacasSeleccionadas = reserva?.butacas;
 
   const precioEntrada = 8;
@@ -235,7 +235,7 @@ const Pago = () => {
         <div className="p-6 space-y-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-400">Pelicula</span>
-            <span className="text-white font-medium">{selectedPelicula?.nombre ?? 'No disponible'}</span>
+            <span className="text-white font-medium">{selectedPelicula?.titulo ?? 'No disponible'}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-400">Fecha</span>

@@ -28,8 +28,11 @@ const MovieCard = ({ id, title, posterUrl, rating, trailerUrl }) => {
           <Boton
             className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md"
             onClick={() => {
-              localStorage.setItem("peliculaSeleccionadaId", id);
-              localStorage.setItem("peliculaSeleccionadaNombre", title); 
+              localStorage.setItem("peliculaSeleccionada", JSON.stringify({
+                id_pelicula: id,
+                titulo: title,
+              }));
+
               navigate(`/Reserva/${id}`);
             }}
           >
