@@ -14,6 +14,7 @@ import Cinesreserva from "./components/SelectCine";
 import HorarioPage from "./components/Horarios";
 import ButacasPage from "./components/Butacas";
 import PagoPage from "./components/Pago";
+import Confirmacion from "./pages/Confirmacion";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <Route path="/faqs" element={<FAQs />} />
       <Route path="/cines" element={<Cines />} />
       <Route path="/dashboard/:userId" element={<Dashboard />} />
+      <Route path="/confirmacion-compra" element={<Confirmacion />} />
 
       <Route path="/reserva/:id" element={<ReservaLayout />}>
         <Route index element={<Cinesreserva />} />
