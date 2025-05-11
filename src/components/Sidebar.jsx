@@ -5,6 +5,14 @@ import { useNavigate } from "react-router-dom";
 export default function Sidebar({ user, selected, onSelect }) {
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
+    onSelect("logout");
+    navigate("/");
+  };
+
   return (
     <aside className="w-60 bg-[#1A1A1A] flex flex-col p-6">
       <div className="flex flex-col items-center mb-8">
@@ -23,8 +31,8 @@ export default function Sidebar({ user, selected, onSelect }) {
             <button
               onClick={() => navigate("/")}
               className={`w-full text-left flex items-center px-4 py-2 rounded-full font-semibold transition ${selected === "CineLuxe"
-                  ? "bg-[#C1A362] text-black"
-                  : "text-white hover:bg-[#2D2D2D]"
+                ? "bg-[#C1A362] text-black"
+                : "text-white hover:bg-[#2D2D2D]"
                 }`}
             >
               <Home className="mr-3" /> CineLuxe
@@ -34,8 +42,8 @@ export default function Sidebar({ user, selected, onSelect }) {
             <button
               onClick={() => onSelect("perfil")}
               className={`w-full text-left flex items-center px-4 py-2 rounded-full font-semibold transition ${selected === "perfil"
-                  ? "bg-[#C1A362] text-black"
-                  : "text-white hover:bg-[#2D2D2D]"
+                ? "bg-[#C1A362] text-black"
+                : "text-white hover:bg-[#2D2D2D]"
                 }`}
             >
               <UserCircle className="mr-3" /> Perfil
@@ -45,8 +53,8 @@ export default function Sidebar({ user, selected, onSelect }) {
             <button
               onClick={() => onSelect("configuracion")}
               className={`w-full text-left flex items-center px-4 py-2 rounded-full font-semibold transition ${selected === "configuracion"
-                  ? "bg-[#C1A362] text-black"
-                  : "text-white hover:bg-[#2D2D2D]"
+                ? "bg-[#C1A362] text-black"
+                : "text-white hover:bg-[#2D2D2D]"
                 }`}
             >
               <Settings className="mr-3" /> Configuración
@@ -57,15 +65,10 @@ export default function Sidebar({ user, selected, onSelect }) {
 
       <button
         className="mt-auto flex items-center px-4 py-2 rounded-lg text-red-400 hover:text-red-800"
-        onClick={() => {
-          localStorage.removeItem("user")
-          localStorage.removeItem("token")
-          onSelect("logout")
-          navigate("/")
-        }}
-      >
-        <LogOut className="mr-3" /> Cerrar sesión
+        onClick={handleLogout}>
+        <LogOut /> Cerrar sesión
       </button>
+
     </aside>
   )
 }
