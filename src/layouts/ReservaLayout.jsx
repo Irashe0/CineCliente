@@ -1,9 +1,26 @@
 import Breadcrumbs from "../components/breadcrums";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import ModalTikets from "../components/modal/modalTikets";
 
 export default function ReservaLayout() {
+  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const userToken = localStorage.getItem("token");
+    if (!userToken) {
+      setIsModalOpen(true);
+    }
+  }, []);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-[var(--gris-oscuro)] flex flex-col relative">
       <Header />
@@ -15,6 +32,14 @@ export default function ReservaLayout() {
         </div>
       </div>
       <Footer />
+
+      {isModalOpen && (
+        <ModalTikets 
+          message="Debes iniciar sesión para continuar con la compra."
+          onClose={closeModal}
+          onLoginClick={() => navigate("/login")}
+        />
+      )}
     </div>
   );
 }
