@@ -62,10 +62,15 @@ const Pago = () => {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify({
-              id_reserva: nuevaReserva.reserva.id,
+              id_reserva: nuevaReserva.reserva.id_reserva,
               id_butaca: butaca.id_butaca,
               total: reservaData.butacas.length * precioEntrada,
             }),
+          });
+          console.log("Datos enviados a /ventas:", {
+            id_reserva: nuevaReserva.reserva.id_reserva,
+            id_butaca: butaca.id_butaca,
+            total: precioEntrada,
           });
 
           if (!ventaResponse.ok) {
