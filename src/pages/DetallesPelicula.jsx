@@ -16,7 +16,7 @@ export default function MovieDetails() {
   const navigate = useNavigate();
 
   const irAReserva = () => {
-    navigate("/reserva");
+    navigate("/Reserva/${id}");
   };
   
   useEffect(() => {
