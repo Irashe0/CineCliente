@@ -46,7 +46,7 @@ export default function Butacas() {
       prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
     );
   };
-  
+
   const filas = useMemo(() => {
     const filaMapping = { A: 0, B: 1, C: 2, D: 3, E: 4 };
     const tempFilas = [];
@@ -117,8 +117,8 @@ export default function Butacas() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <h2 className="text-center text-xl font-bold text-[var(--texto-primario)]">Selecciona tus butacas</h2>
+    <div className="space-y-6 px-4 py-6 sm:px-6 md:px-10 lg:px-20">
+      <h2 className="text-center text-xl sm:text-2xl font-bold text-[var(--texto-primario)]">Selecciona tus butacas</h2>
       <p className="text-center text-sm text-[var(--texto-secundario)]">
         Sala: <strong>{sala}</strong> | Horario: <strong>{horario}</strong>
       </p>
@@ -130,37 +130,50 @@ export default function Butacas() {
 
         <div className="space-y-2">
           {filas.map((fila, i) => (
-            <div key={i} className="flex justify-center gap-3">
+            <div key={i} className="flex justify-center flex-wrap gap-3">
               {fila.map((butaca) => (
                 <button
                   key={butaca.id_butaca}
                   onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
-                  className={`flex justify-center items-center p-2 rounded border border-[var(--borde-suave)] ${butaca.estado === "Ocupada" || butaca.estado === "Reservada" ? "opacity-50 cursor-not-allowed" : ""}`}
-                  disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"} // Deshabilitar si la butaca está ocupada o reservada
+                  className={`flex justify-center items-center p-2 rounded border border-[var(--borde-suave)] ${
+                    butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
                 >
                   <Armchair
-                    className="h-6 w-6"
+                    className="h-6 w-6 sm:h-7 sm:w-7"
                     color={
                       selectedButacas.includes(butaca.id_butaca)
                         ? "#CDAA7D"
-                        : butaca.estado === "Ocupada"
-                          ? "#a3a2a2" 
-                          : butaca.estado === "Reservada"
-                            ? "#a3a2a2" 
-                            : "#EDE6D6" 
+                        : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                          ? "#a3a2a2"
+                          : "#EDE6D6"
                     }
                   />
                 </button>
               ))}
-
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex justify-between mt-8">
-        <Boton onClick={() => navigate("/reserva/horario")} variante="outline" className="text-[var(--principal)] border-[var(--borde-suave)]">Volver</Boton>
-        <Boton onClick={handleContinuar} disabled={selectedButacas.length === 0} className="bg-[var(--principal)] text-white">Continuar</Boton>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
+        <Boton
+          onClick={() => navigate("/reserva/horario")}
+          variante="outline"
+          className="w-full sm:w-auto text-[var(--principal)] border-[var(--borde-suave)]"
+        >
+          Volver
+        </Boton>
+        <Boton
+          onClick={handleContinuar}
+          disabled={selectedButacas.length === 0}
+          className="w-full sm:w-auto bg-[var(--principal)] text-white"
+        >
+          Continuar
+        </Boton>
       </div>
     </div>
   );

@@ -14,26 +14,27 @@ const Footer = () => {
             </p>
           </div>
 
-          <div>
+          <nav aria-label="Información adicional">
             <h4 className="text-md font-semibold mb-2 text-left">Información Adicional</h4>
             <ul className="text-xs space-y-1 text-left">
               <li>
-                <Link href="/SobreNosotros" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
+                <Link to="/SobreNosotros" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
                   Sobre Nosotros
                 </Link>
               </li>
               <li>
-                <Link href="/faqs" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
+                <Link to="/faqs" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
                   FAQs
                 </Link>
               </li>
               <li className="pt-1">
-                <Link href="/cines" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
+                <Link to="/cines" className="text-gray-500 hover:text-[#CDAA7D] transition-colors">
                   Cines
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
+
 
           <div className="flex justify-center">
             <div className="rounded-lg overflow-hidden w-full max-w-xs">
