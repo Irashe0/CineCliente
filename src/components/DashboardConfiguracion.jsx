@@ -61,7 +61,6 @@ export default function DashboardConfiguracion({ user }) {
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || "Error al actualizar la contraseña.");
 
       setSuccess("Contraseña actualizada exitosamente.");
@@ -94,13 +93,10 @@ export default function DashboardConfiguracion({ user }) {
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || "Error al actualizar el correo.");
 
       setSuccess("Correo actualizado exitosamente.");
-      setTimeout(() => {
-        setSuccess("");
-      }, 2000);
+      setTimeout(() => setSuccess(""), 2000);
 
     } catch (err) {
       setError(err.message);
@@ -109,9 +105,9 @@ export default function DashboardConfiguracion({ user }) {
 
   return (
     <>
-      <h2 className="text-2xl font-semibold mb-6">Configuración</h2>
+      <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-center">Configuración</h2>
 
-      <div className="flex border-b border-gray-700 mb-6">
+      <div className="flex border-b border-gray-700 mb-6 text-sm sm:text-base">
         <button
           className={`p-3 flex-1 text-center font-semibold ${
             activeTab === "password" ? "text-[var(--principal)] border-b-2 border-[var(--principal)]" : "text-gray-400"
@@ -138,96 +134,92 @@ export default function DashboardConfiguracion({ user }) {
         </button>
       </div>
 
-      <div className="bg-[#1A1A1A] p-6 rounded-lg border border-gray-700 space-y-6 w-1/2 mx-auto">
+      <div className="bg-[#1A1A1A] p-6 rounded-lg border border-gray-700 space-y-6 w-full max-w-xl mx-auto px-4 sm:px-6">
         {activeTab === "password" && (
-          <>
-            <form onSubmit={handlePasswordChange} className="space-y-5">
-              <div className="relative">
-                <label className="block text-lg mb-1">Contraseña Actual</label>
-                <input
-                  type={showCur ? "text" : "password"}
-                  className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-8"
-                  onClick={() => setShowCur(!showCur)}
-                >
-                  {showCur ? <Eye /> : <EyeOff />}
-                </button>
-              </div>
-              <div className="relative">
-                <label className="block text-lg mb-1">Nueva Contraseña</label>
-                <input
-                  type={showNew ? "text" : "password"}
-                  className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-8"
-                  onClick={() => setShowNew(!showNew)}
-                >
-                  {showNew ?  <Eye /> : <EyeOff />}
-                </button>
-              </div>
-              <div className="relative">
-                <label className="block text-lh mb-1">Confirmar Nueva Contraseña</label>
-                <input
-                  type={showConf ? "text" : "password"}
-                  className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-8"
-                  onClick={() => setShowConf(!showConf)}
-                >
-                  {showConf ? <Eye /> : <EyeOff />}
-                </button>
-              </div>
-
-              {/* Mensajes */}
-              {error && <p className="text-red-500 text-center">{error}</p>}
-              {success && <p className="text-green-500 text-center">{success}</p>}
-
-              <button type="submit" className="w-full bg-[var(--principal)] text-black px-4 py-2 rounded font-semibold hover:bg-opacity-80">
-                Actualizar Contraseña
+          <form onSubmit={handlePasswordChange} className="space-y-5">
+            <div className="relative">
+              <label className="block text-lg mb-1">Contraseña Actual</label>
+              <input
+                type={showCur ? "text" : "password"}
+                className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-8"
+                onClick={() => setShowCur(!showCur)}
+              >
+                {showCur ? <Eye /> : <EyeOff />}
               </button>
-            </form>
-          </>
+            </div>
+
+            <div className="relative">
+              <label className="block text-lg mb-1">Nueva Contraseña</label>
+              <input
+                type={showNew ? "text" : "password"}
+                className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-8"
+                onClick={() => setShowNew(!showNew)}
+              >
+                {showNew ? <Eye /> : <EyeOff />}
+              </button>
+            </div>
+
+            <div className="relative">
+              <label className="block text-lg mb-1">Confirmar Nueva Contraseña</label>
+              <input
+                type={showConf ? "text" : "password"}
+                className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-8"
+                onClick={() => setShowConf(!showConf)}
+              >
+                {showConf ? <Eye /> : <EyeOff />}
+              </button>
+            </div>
+
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            {success && <p className="text-green-500 text-center">{success}</p>}
+
+            <button type="submit" className="w-full bg-[var(--principal)] text-black px-4 py-2 rounded font-semibold hover:bg-opacity-80">
+              Actualizar Contraseña
+            </button>
+          </form>
         )}
 
         {activeTab === "email" && (
-          <>
-            <form onSubmit={handleEmailChange} className="space-y-4">
-              <div>
-                <label className="block text-lg mb-1">Correo Nuevo</label>
-                <input
-                  type="email"
-                  className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  required
-                />
-              </div>
+          <form onSubmit={handleEmailChange} className="space-y-4">
+            <div>
+              <label className="block text-lg mb-1">Correo Nuevo</label>
+              <input
+                type="email"
+                className="w-full p-2 bg-[#121212] border border-gray-700 rounded"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                required
+              />
+            </div>
 
-              {/* Mensajes */}
-              {error && <p className="text-red-500 text-center">{error}</p>}
-              {success && <p className="text-green-500 text-center">{success}</p>}
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            {success && <p className="text-green-500 text-center">{success}</p>}
 
-              <button type="submit" className="w-full bg-[var(--principal)] text-black px-4 py-2 rounded font-semibold hover:bg-opacity-80">
-                Guardar Correo
-              </button>
-            </form>
-          </>
+            <button type="submit" className="w-full bg-[var(--principal)] text-black px-4 py-2 rounded font-semibold hover:bg-opacity-80">
+              Guardar Correo
+            </button>
+          </form>
         )}
       </div>
     </>

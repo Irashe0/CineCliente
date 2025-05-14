@@ -64,12 +64,9 @@ export default function Dashboard() {
         {isSidebarOpen ? <X size={32} /> : <AlignJustify size={32} />}
       </button>
 
-      {/* Fondo negro semitransparente para cerrar el sidebar en móviles */}
       {isSidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden" onClick={toggleSidebar} />}
 
-      {/* Sidebar sin ocupar espacio cuando está cerrado */}
-      <div className={` row-span-2 transition-all duration-300 ease-in-out z-20  ${isSidebarOpen ? "fixed inset-y-0 left-0 w-64 h-screen bg-[#1A1A1A]" : "w-0 h-0 overflow-hidden"}
-lg:w-60 lg:h-auto lg:static`}>
+      <div className={` row-span-2 transition-all duration-300 ease-in-out z-20  ${isSidebarOpen ? "fixed inset-y-0 left-0 w-64 h-screen bg-[#1A1A1A]" : "w-0 h-0 overflow-hidden"} lg:w-60 lg:h-auto lg:static`}>
         <Sidebar user={user} selected={page} onSelect={handleSelect} />
       </div>
 
