@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
 import Perfil from "../components/DashboardPerfil"
 import Configuracion from "../components/DashboardConfiguracion"
+import Reservas from "../components/MisReservas"
 import Footer from "../components/Footer"
 import { AlignJustify, X } from "lucide-react"
 
@@ -73,6 +74,7 @@ export default function Dashboard() {
       <main className="p-8 overflow-auto flex-grow">
         {page === "perfil" && <Perfil user={user} />}
         {page === "configuracion" && <Configuracion user={user} />}
+        {page === "reservas" && <Reservas user={user} />}
       </main>
 
       <Footer className="col-span-2" />

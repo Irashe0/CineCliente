@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, UserCircle, Settings, LogOut } from "lucide-react"
+import { Home, UserCircle, Settings, LogOut, Ticket } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export default function Sidebar({ user, selected, onSelect }) {
@@ -56,6 +56,16 @@ export default function Sidebar({ user, selected, onSelect }) {
               }`}
             >
               <Settings className="mr-3" /> Configuración
+            </button>
+          </li>
+                    <li>
+            <button
+              onClick={() => onSelect("configuracion")}
+              className={`w-full text-left flex items-center px-4 py-3 rounded-full font-semibold transition ${
+                selected === "reservas" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
+              }`}
+            >
+              <Ticket className="mr-3" /> Mis reservas
             </button>
           </li>
         </ul>
