@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Search, X } from "lucide-react"
+import { Search, X, CircleUserRound } from "lucide-react" // Importamos el ícono
 import { Link, useNavigate } from "react-router-dom"
 
 const Header = () => {
@@ -105,9 +105,18 @@ const Header = () => {
 
             {user ? (
               <div className="flex items-center space-x-4">
-                <Link to={`/dashboard/${user.id}`} className="text-lg font-semibold text-[#CDAA7D]">
-                  {user.name}
-                </Link>
+                <div className="hidden md:flex items-center space-x-2">
+                  <CircleUserRound size={24} className="text-[#CDAA7D]" />
+                  <Link to={`/dashboard/${user.id}`} className="text-lg font-semibold text-[#CDAA7D]">
+                    {user.name}
+                  </Link>
+                </div>
+                {/* Solo el ícono en pantallas pequeñas */}
+                <div className="md:hidden">
+                  <Link to={`/dashboard/${user.id}`}>
+                    <CircleUserRound size={24} className="text-[#CDAA7D]" />
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="flex items-center space-x-4">

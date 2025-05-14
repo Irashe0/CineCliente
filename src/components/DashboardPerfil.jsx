@@ -14,9 +14,9 @@ export default function DashboardPerfil({ user: initialUser }) {
   }, []);
 
   return (
-    <>
-      <h2 className="text-2xl font-semibold mb-4">Mi Perfil</h2>
-      <div className="bg-[#1A1A1A] border border-[var(--principal)] rounded-lg p-6 space-y-6">
+    <div className="flex flex-col items-center justify-start w-full max-w-lg mx-auto mt-0">
+      <h2 className="text-2xl font-semibold mb-4 text-center">Mi Perfil</h2>
+      <div className="bg-[#1A1A1A] border border-[var(--principal)] rounded-lg p-6 space-y-6 w-full">
         <div className="flex justify-center">
           <UserCircle className="h-24 w-24 text-[var(--principal)]" />
         </div>
@@ -26,7 +26,7 @@ export default function DashboardPerfil({ user: initialUser }) {
         </div>
         <hr className="border-[var(--principal)]" />
         <section className="text-center">
-          <h4 className="font-semibold mb-10 text-2xl">Información Personal</h4>
+          <h4 className="font-semibold mb-6 text-2xl">Información Personal</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
             <div>
               <p className="text-lg text-[var(--principal)]">Nombre</p>
@@ -39,6 +39,6 @@ export default function DashboardPerfil({ user: initialUser }) {
           </div>
         </section>
       </div>
-    </>
-  )
+    </div>
+  );
 }

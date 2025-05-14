@@ -1,21 +1,22 @@
-import { Home, UserCircle, Settings, LogOut } from "lucide-react"
-import { useNavigate } from "react-router-dom";
+"use client"
 
+import { Home, UserCircle, Settings, LogOut } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 export default function Sidebar({ user, selected, onSelect }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem("user")
+    localStorage.removeItem("token")
 
-    onSelect("logout");
-    navigate("/");
-  };
+    onSelect("logout")
+    navigate("/")
+  }
 
   return (
-    <aside className="w-60 bg-[#1A1A1A] flex flex-col p-6">
-      <div className="flex flex-col items-center mb-8">
+    <aside className="flex flex-col p-6 h-full justify-center lg:justify-start">
+      <div className="flex flex-col items-center">
         <UserCircle className="h-16 w-16 text-gray-500 mb-2" />
         {user && (
           <>
@@ -26,14 +27,13 @@ export default function Sidebar({ user, selected, onSelect }) {
       </div>
 
       <nav className="flex-1">
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           <li>
             <button
               onClick={() => navigate("/")}
-              className={`w-full text-left flex items-center px-4 py-2 rounded-full font-semibold transition ${selected === "CineLuxe"
-                ? "bg-[#C1A362] text-black"
-                : "text-white hover:bg-[#2D2D2D]"
-                }`}
+              className={`w-full text-left flex items-center px-4 py-3 rounded-full font-semibold transition ${
+                selected === "CineLuxe" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
+              }`}
             >
               <Home className="mr-3" /> CineLuxe
             </button>
@@ -41,10 +41,9 @@ export default function Sidebar({ user, selected, onSelect }) {
           <li>
             <button
               onClick={() => onSelect("perfil")}
-              className={`w-full text-left flex items-center px-4 py-2 rounded-full font-semibold transition ${selected === "perfil"
-                ? "bg-[#C1A362] text-black"
-                : "text-white hover:bg-[#2D2D2D]"
-                }`}
+              className={`w-full text-left flex items-center px-4 py-3 rounded-full font-semibold transition ${
+                selected === "perfil" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
+              }`}
             >
               <UserCircle className="mr-3" /> Perfil
             </button>
@@ -52,10 +51,9 @@ export default function Sidebar({ user, selected, onSelect }) {
           <li>
             <button
               onClick={() => onSelect("configuracion")}
-              className={`w-full text-left flex items-center px-4 py-2 rounded-full font-semibold transition ${selected === "configuracion"
-                ? "bg-[#C1A362] text-black"
-                : "text-white hover:bg-[#2D2D2D]"
-                }`}
+              className={`w-full text-left flex items-center px-4 py-3 rounded-full font-semibold transition ${
+                selected === "configuracion" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
+              }`}
             >
               <Settings className="mr-3" /> Configuración
             </button>
@@ -64,11 +62,11 @@ export default function Sidebar({ user, selected, onSelect }) {
       </nav>
 
       <button
-        className="mt-auto flex items-center px-4 py-2 rounded-lg text-red-400 hover:text-red-800"
-        onClick={handleLogout}>
-        <LogOut /> Cerrar sesión
+        className="mt-auto flex items-center px-4 py-3 rounded-lg text-red-400 hover:text-red-800"
+        onClick={handleLogout}
+      >
+        <LogOut className="mr-2" /> Cerrar sesión
       </button>
-
     </aside>
   )
 }
