@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, CreditCardIcon } from "lucide-react";
 import Button from "../components/ComponentesExternos/Boton";
 import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
 
 const Pago = () => {
   const [showCardNumber, setShowCardNumber] = useState(false);
@@ -18,7 +19,21 @@ const Pago = () => {
 
   const API_BASE = import.meta.env.VITE_API_URL;
 
+  const formRef = useRef(null);
+
   const handleCompra = async () => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const inputs = form.querySelectorAll("input, select");
+    for (let input of inputs) {
+      if (input.hasAttribute("required") && !input.value.trim()) {
+        alert("Por favor completa todos los campos requeridos.");
+        input.focus();
+        return;
+      }
+    }
+
     try {
       const reservaData = JSON.parse(localStorage.getItem("reserva"));
       const user = JSON.parse(localStorage.getItem("user"));
@@ -66,11 +81,6 @@ const Pago = () => {
               id_butaca: butaca.id_butaca,
               total: reservaData.butacas.length * precioEntrada,
             }),
-          });
-          console.log("Datos enviados a /ventas:", {
-            id_reserva: nuevaReserva.reserva.id_reserva,
-            id_butaca: butaca.id_butaca,
-            total: precioEntrada,
           });
 
           if (!ventaResponse.ok) {
@@ -126,7 +136,7 @@ const Pago = () => {
               <h3 className="text-[#cdaa7d] text-3xl font-bold">Pago</h3>
             </div>
             <div className="p-6 space-y-6">
-              <form className="w-full">
+              <form ref={formRef} className="w-full">
                 <div className="space-y-4">
                   {/* Datos personales */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
