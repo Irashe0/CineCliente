@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
 import Boton from "../components/ComponentesExternos/Boton"
+import CinemaLuxeBackground from "../components/ComponentesExternos/bg"; 
 
 export default function Register() {
   const [name, setName] = useState("")
@@ -97,6 +98,8 @@ export default function Register() {
   };
   
   return (
+    <>
+    <CinemaLuxeBackground/>
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
       <div className="absolute top-6 left-0 right-0 text-center">
         <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
@@ -202,5 +205,6 @@ export default function Register() {
         </div>
       </div>
     </div>
+    </>
   )
 }

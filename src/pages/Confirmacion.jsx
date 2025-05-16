@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Boton from "../components/ComponentesExternos/Boton";
+import CinemaLuxeBackground from "../components/ComponentesExternos/bg"; 
 
 export default function ConfirmacionCompra() {
     const navigate = useNavigate();
@@ -20,18 +21,21 @@ export default function ConfirmacionCompra() {
     const handleVolver = async () => {
         try {
             const token = localStorage.getItem("token");
-
             if (!token) {
                 alert("Debes estar logueado para guardar la factura.");
                 return;
             }
 
             const facturaData = JSON.parse(localStorage.getItem("facturaData")) || {};
-            let numeroFactura = localStorage.getItem("codigoSeguimiento") || generarCodigo();
+            console.log("Factura Data:", facturaData);
+            let numeroFactura = localStorage.getItem("codigoSeguimiento");
 
-            console.log("📌 Datos de factura antes de enviar:", facturaData);
+            if (!numeroFactura) {
+                numeroFactura = generarCodigo();
+                localStorage.setItem("codigoSeguimiento", numeroFactura);
+            }
 
-            if (!facturaData.id_venta || !facturaData.total) {
+            if (!facturaData.ventas || facturaData.ventas.length === 0 || !facturaData.total) {
                 console.error("❌ Error: La factura no tiene los datos necesarios.");
                 alert("Hubo un problema con la compra. Verifica que se haya procesado correctamente.");
                 return;
@@ -43,6 +47,7 @@ export default function ConfirmacionCompra() {
             };
 
             const res = await fetch(`${API_BASE}/facturas`, {
+                mode: 'no-cors',
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -51,11 +56,11 @@ export default function ConfirmacionCompra() {
                 body: JSON.stringify(facturaFinal),
             });
 
+            console.log("Factura Final:", facturaFinal);
+
             if (!res.ok) {
                 throw new Error("Error al guardar la factura");
             }
-
-            console.log("📌 Factura guardada correctamente:", facturaFinal);
 
             localStorage.removeItem("facturaData");
             localStorage.removeItem("codigoSeguimiento");
@@ -67,14 +72,14 @@ export default function ConfirmacionCompra() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
+        <CinemaLuxeBackground> {/* Envuelve el contenido dentro del fondo */}
             <div className="absolute top-6 left-0 right-0 text-center">
                 <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
                     CineLuxe
                 </Link>
             </div>
 
-            <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] border-opacity-50">
+            <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D]">
                 <div className="bg-gradient-to-t from-[#0F0F0F] to-[#1E1E1E] p-6 flex flex-col items-center">
                     <h2 className="text-2xl font-serif text-center font-bold text-[#E0E0E0] mb-3">
                         ¡Compra Realizada con éxito!
@@ -94,6 +99,6 @@ export default function ConfirmacionCompra() {
                     </Boton>
                 </div>
             </div>
-        </div>
+        </CinemaLuxeBackground>
     );
 }

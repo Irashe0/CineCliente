@@ -3,10 +3,12 @@
 import { Link } from "react-router-dom"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
+import CinemaLuxeBackground from "../components/ComponentesExternos/bg"; 
 
 export default function AboutUs() {
   return (
     <>
+      <CinemaLuxeBackground />
         <Header className="fixed top-0 left-0 w-full z-50" />
 
       <div className="flex min-h-screen items-center justify-center p-4">

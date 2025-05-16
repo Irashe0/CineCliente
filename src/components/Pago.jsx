@@ -93,7 +93,6 @@ const Pago = () => {
       }
 
       const nuevaReserva = await reservaResponse.json();
-      let totalCompra = reservaData.butacas.length * precioEntrada;
 
       let numeroFactura = localStorage.getItem("codigoSeguimiento");
       if (!numeroFactura) {
@@ -101,7 +100,11 @@ const Pago = () => {
         localStorage.setItem("codigoSeguimiento", numeroFactura);
       }
 
+      let totalCompra = reservaData.butacas.length * precioEntrada;
+
       let ventasExitosas = true;
+      const ventaIds = [];
+
       await Promise.all(
         reservaData.butacas.map(async (butaca) => {
           const ventaResponse = await fetch(`${API_BASE}/ventas`, {
@@ -114,10 +117,14 @@ const Pago = () => {
               id_reserva: nuevaReserva.reserva.id_reserva,
               id_butaca: butaca.id_butaca,
               total: precioEntrada,
+              numero_factura: numeroFactura, 
             }),
           });
 
-          if (!ventaResponse.ok) {
+          if (ventaResponse.ok) {
+            const ventaData = await ventaResponse.json();
+            ventaIds.push(ventaData.id);
+          } else {
             console.error(`❌ Error al registrar la venta de la butaca ${butaca.id_butaca}`);
             ventasExitosas = false;
           }
@@ -154,9 +161,9 @@ const Pago = () => {
       }
 
       const facturaData = {
-        id_venta: nuevaReserva.reserva.id_reserva,
+        ventas: ventaIds,
         total: totalCompra,
-        numero_factura: numeroFactura, 
+        numero_factura: numeroFactura,
       };
 
       console.log("📌 Datos de factura guardados en `localStorage`:", facturaData);
@@ -167,6 +174,8 @@ const Pago = () => {
       console.error("❌ Error en el proceso de compra:", error);
     }
   };
+
+
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
