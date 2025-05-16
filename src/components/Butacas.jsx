@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Armchair } from "lucide-react"; // Asegurar que esté importado correctamente
+import { Armchair } from "lucide-react";
 import Boton from "../components/ComponentesExternos/Boton";
 
-const FILAS = 10;
 const PASILLO_HORIZ = 5;
 
 export default function Butacas() {
@@ -19,7 +18,7 @@ export default function Butacas() {
   useEffect(() => {
     const fetchButacas = async () => {
       try {
-        const res = await fetch(`${API_BASE}/butacas/sala/2/horario/159`);
+        const res = await fetch(`${API_BASE}/butacas/sala/${sala}/horario/${id_horario}`);
         if (!res.ok) throw new Error("Error al obtener butacas");
         const data = await res.json();
 
@@ -49,28 +48,26 @@ export default function Butacas() {
     });
   };
 
-const filas = useMemo(() => {
-  const butacasPorFila = {};
+  const filas = useMemo(() => {
+    const butacasPorFila = {};
 
-  butacas.forEach((butaca) => {
-    const fila = butaca.fila;
-    const subFila = butaca.numero <= 5 ? `${fila}_1` : `${fila}_2`;
+    butacas.forEach((butaca) => {
+      const fila = butaca.fila;
+      const subFila = butaca.numero <= 5 ? `${fila}_1` : `${fila}_2`;
 
-    if (!butacasPorFila[subFila]) {
-      butacasPorFila[subFila] = [];
-    }
-    butacasPorFila[subFila].push(butaca);
-  });
+      if (!butacasPorFila[subFila]) {
+        butacasPorFila[subFila] = [];
+      }
+      butacasPorFila[subFila].push(butaca);
+    });
 
-  Object.keys(butacasPorFila).forEach((fila) => {
-    butacasPorFila[fila].sort((a, b) => a.numero - b.numero);
-  });
+    Object.keys(butacasPorFila).forEach((fila) => {
+      butacasPorFila[fila].sort((a, b) => a.numero - b.numero);
+    });
 
-  console.log("📌 Butacas organizadas correctamente sin filas vacías:", butacasPorFila);
-  return butacasPorFila;
-}, [butacas]);
-
-
+    console.log("📌 Butacas organizadas correctamente sin filas vacías:", butacasPorFila);
+    return butacasPorFila;
+  }, [butacas]);
 
 
   const handleContinuar = () => {
@@ -106,38 +103,39 @@ const filas = useMemo(() => {
         <div className="space-y-4">
           {Object.entries(filas).map(([filaLabel, butacasFila], i) => (
             <div key={i}>
-              {/* Pasillo horizontal visual entre fila 5 y 6 */}
               {i === PASILLO_HORIZ && <div className="h-4 sm:h-6" />}
 
               <div className="flex justify-center items-center gap-2">
-                {/* Número a la izquierda (Java: TextView label) */}
                 <div className="w-8 h-8 flex items-center justify-center text-sm font-bold">
                   {i + 1}
                 </div>
 
-                {/* Butacas */}
                 {butacasFila.map((butaca, j) => (
                   butaca ? (
                     <button
                       key={j}
                       onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
                       disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
-                      className={`w-[ANCHO_BUT] h-[LARGO_BUT] border rounded flex items-center justify-center transition-all duration-200
-                  ${selectedButacas.has(butaca.id_butaca) ? "bg-[var(--principal)]" : "bg-gray-700"}
-                  ${butaca.estado === "Ocupada" || butaca.estado === "Reservada" ? "opacity-40 cursor-not-allowed" : "hover:scale-110"}
-                `}
+                      className={`w-16 h-16 sm:w-20 sm:h-20 border rounded-lg flex items-center justify-center transition-all duration-200
+        ${butaca.estado === "Ocupada" || butaca.estado === "Reservada" ? "opacity-40 cursor-not-allowed" : ""}
+      `}
                     >
-                      <Armchair className="h-5 w-5" />
+                      <Armchair
+                        className="h-6 w-6 sm:h-8 sm:w-8 transition-all duration-200"
+                        color={selectedButacas.has(butaca.id_butaca) ? "#CDAA7D" : "#EDE6D6"}
+                      />
                     </button>
                   ) : (
-                    <div key={j} className="w-[ANCHO_BUT] h-[LARGO_BUT] border bg-gray-600 opacity-50"></div>
+                    <div key={j} className="w-20 h-20 sm:w-20 sm:h-20 border rounded-lg opacity-30" />
                   )
                 ))}
 
-                {/* Número a la derecha (Java: TextView label) */}
-                <div className="w-8 h-8 flex items-center justify-center text-sm font-bold">
+
+                <div className="w-10 h-10 text-lg font-bold text-white flex items-center justify-center">
                   {i + 1}
                 </div>
+
+
               </div>
             </div>
           ))}

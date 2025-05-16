@@ -203,7 +203,7 @@ const Pago = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <h3 className="text-[#cdaa7d] text-3xl font-bold mt-10 text-center">Método de Pago</h3>
                 <div className="space-y-4 mt-6">
                   <div>
@@ -218,16 +218,13 @@ const Pago = () => {
                   <div className="relative">
                     <label className="text-lg text-white">Número de tarjeta</label>
                     <input
-                      type={showCardNumber ? "text" : "password"}
-                      className="w-full px-3 py-2 pl-10 pr-10 rounded-md bg-neutral-800 border border-neutral-600 text-white"
+                      type={showCardNumber ? "text" : ""}
+                      className="w-full px-3 py-2 pr-10 rounded-md bg-neutral-800 border border-neutral-600 text-white"
                       maxLength={19}
                       required
                       onInput={(e) => e.target.value = e.target.value.replace(/\D/g, "").slice(0, 16)}
                     />
-                    <CreditCardIcon className="absolute left-3 top-9 h-4 w-4 text-gray-400" />
-                    <button type="button" className="absolute right-3 top-9 text-gray-400" onClick={() => setShowCardNumber(!showCardNumber)}>
-                      {showCardNumber ? <EyeOff /> : <Eye />}
-                    </button>
+
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
