@@ -73,41 +73,46 @@ export default function Butacas() {
         </div>
 
         <div className="space-y-2">
-          {filas.map((fila, i) => (
-            <div key={i} className="flex justify-center flex-wrap gap-3">
-              {fila.map((butaca, j) =>
-                butaca?.tipo === "label" ? (
-                  <div key={`label-${i}-${j}`} className="w-12 h-12 flex items-center justify-center text-lg">
-                    {butaca.valor}
-                  </div>
-                ) : butaca ? (
-                  <button
-                    key={butaca.id_butaca}
-                    onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
-                    className={`flex justify-center items-center p-2 rounded border border-[var(--borde-suave)] ${butaca.estado === "Ocupada" || butaca.estado === "Reservada"
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
-                      }`}
-                    disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
-                  >
-                    <Armchair
-                      className="h-6 w-6 sm:h-7 sm:w-7"
-                      color={
-                        selectedButacas.includes(butaca.id_butaca)
-                          ? "#CDAA7D"
-                          : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
-                            ? "#a3a2a2"
-                            : "#EDE6D6"
-                      }
-                    />
-                  </button>
-                ) : (
-                  <div key={`pasillo-${i}-${j}`} className="w-12 h-12"></div>
-                )
-              )}
-            </div>
-          ))}
-        </div>
+  {filas.map((fila, i) => (
+    <div key={i} className="flex justify-center flex-wrap gap-1 sm:gap-3">
+      {fila.map((butaca, j) =>
+        butaca?.tipo === "label" ? (
+          <div
+            key={`label-${i}-${j}`}
+            className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-sm sm:text-lg"
+          >
+            {butaca.valor}
+          </div>
+        ) : butaca ? (
+          <button
+            key={butaca.id_butaca}
+            onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
+            className={`flex justify-center items-center p-1 sm:p-2 rounded border border-[var(--borde-suave)] ${
+              butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
+          >
+            <Armchair
+              className="h-5 w-5 sm:h-7 sm:w-7"
+              color={
+                selectedButacas.includes(butaca.id_butaca)
+                  ? "#CDAA7D"
+                  : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                  ? "#a3a2a2"
+                  : "#EDE6D6"
+              }
+            />
+          </button>
+        ) : (
+          <div key={`pasillo-${i}-${j}`} className="w-10 h-10 sm:w-12 sm:h-12"></div>
+        )
+      )}
+    </div>
+  ))}
+</div>
+
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
