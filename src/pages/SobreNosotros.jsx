@@ -1,13 +1,11 @@
-"use client"
-
 import { Link } from "react-router-dom"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 
-export default function AboutUs() {
+export default function SobreNosotros() {
   return (
     <>
-        <Header className="fixed top-0 left-0 w-full z-50" />
+      <Header className="fixed top-0 left-0 w-full z-50" />
 
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="absolute top-6 left-0 right-0 mt-40 text-center">
@@ -21,39 +19,42 @@ export default function AboutUs() {
             <h2 className="text-3xl font-serif font-bold text-[#E0E0E0] mb-3">
               Sobre Nosotros
             </h2>
+            <h6 className="italic text-lg text-[#CDAA7D]">
+              Vive una experiencia de lujo al puro estilo madrileño
+            </h6>
             <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-[#CDAA7D] to-transparent mb-6"></div>
 
             <p className="text-[#E0E0E0] text-center leading-relaxed">
-              En <span className="text-[#CDAA7D] font-semibold">CineLuxe</span>, celebramos la magia del cine.
-              Nuestro objetivo es brindar una experiencia cinematográfica única, donde cada película se vive
-              como una obra de arte. Nos apasiona el séptimo arte y trabajamos cada día para hacer que el cine sea
-              accesible, emocionante y envolvente.
+              En <span className="text-[#CDAA7D] font-semibold">CineLuxe</span>, el cine no es solo entretenimiento, es un ritual.
+              Aquí, cada proyección es un evento, cada asiento un palco de honor, y cada detalle está pensado para
+              ofrecerte una experiencia digna de la más alta sociedad madrileña. No venimos a cambiar el cine,
+              venimos a perfeccionarlo.
             </p>
 
             <div className="mt-6 text-center">
-              <h3 className="text-2xl font-serif font-bold text-[#CDAA7D] mb-3">Nuestros valores</h3>
-              <ul className="text-[#E0E0E0] space-y-2">
-                <li>🎥 Pasión por el cine</li>
-                <li>🌍 Accesibilidad y diversidad</li>
-                <li>✨ Experiencia envolvente</li>
-                <li>🚀 Innovación constante</li>
-              </ul>
+              <h3 className="text-2xl font-serif font-bold text-[#CDAA7D] mb-3">La distinción hecha cine</h3>
+              <p className="text-[#E0E0E0]">
+                No se trata solo de ver una película, sino de sentir el lujo en cada fotograma, 
+                de dejarse envolver por la atmósfera selecta de Madrid y sumergirse en un cine que no es para cualquiera, 
+                sino para aquellos que saben apreciar lo extraordinario.
+              </p>
             </div>
 
-            <div className="mt-8">
-              <h3 className="text-2xl font-serif font-bold text-[#CDAA7D] mb-3">Nuestro equipo</h3>
+            <div className="mt-8 text-center">
+              <h3 className="text-2xl font-serif font-bold text-[#CDAA7D] mb-3">El cine con sello madrileño</h3>
               <p className="text-[#E0E0E0]">
-                CineLuxe está compuesto por cineastas, críticos, diseñadores y amantes del cine que trabajan juntos
-                para ofrecer la mejor experiencia cinematográfica. Cada película que seleccionamos, cada espacio que
-                creamos, está pensado para brindarte una noche inolvidable.
+                En CineLuxe, el carácter castizo se mezcla con la exquisitez del séptimo arte.
+                Salas diseñadas con la elegancia de los grandes teatros, un ambiente de exclusividad que te envuelve
+                desde el primer momento y una cartelera seleccionada con el más fino criterio. Porque aquí,
+                el cine no es para todos, es para los que saben disfrutarlo.
               </p>
             </div>
 
             <div className="mt-8">
               <h3 className="text-2xl font-serif font-bold text-[#CDAA7D] mb-3">Nuestro Horario</h3>
               <p className="text-[#E0E0E0]">
-                Estamos abiertos todos los días de la semana, de <span className="text-[#CDAA7D] font-semibold">10:00 a 22:00 horas</span> . ¡Ven y disfruta de una película
-                con nosotros!
+                Cada día abrimos nuestras puertas de <span className="text-[#CDAA7D] font-semibold">10:00 a 22:00</span>,
+                ofreciéndote el lujo de disfrutar el cine como solo Madrid lo sabe hacer. Ven, acomódate y déjate envolver por la grandeza de CineLuxe.
               </p>
             </div>
           </div>

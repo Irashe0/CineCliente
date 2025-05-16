@@ -67,8 +67,7 @@ export default function MovieDetails() {
 
   return (
     <>
-
-      <main className="min-h-screen flex flex-col text-white bg-black">
+      <main className="min-h-screen flex flex-col text-white bg-gradient-to-b from-[#000000] via-[#000000] to-transparent">
         <Header />
         <div className="relative w-full h-[50vh] md:h-[60vh]">
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10 pointer-events-none" />
