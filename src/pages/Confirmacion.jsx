@@ -4,11 +4,11 @@ import Boton from "../components/ComponentesExternos/Boton";
 
 export default function ConfirmacionCompra() {
     const navigate = useNavigate();
-    const reserva = JSON.parse(localStorage.getItem("reserva")) || {};
     const [codigoSeguimiento, setCodigoSeguimiento] = useState("");
 
+    const API_BASE = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
-        // Si ya existe un código en localStorage, úsalo. Si no, genera uno.
         let codigo = localStorage.getItem("codigoSeguimiento");
         if (!codigo) {
             codigo = generarCodigo();
@@ -17,23 +17,53 @@ export default function ConfirmacionCompra() {
         setCodigoSeguimiento(codigo);
     }, []);
 
-    const generarCodigo = () => {
-        const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const numeros = "0123456789";
-        let codigo = "";
-        for (let i = 0; i < 3; i++) {
-            codigo += letras.charAt(Math.floor(Math.random() * letras.length));
-        }
-        for (let i = 0; i < 5; i++) {
-            codigo += numeros.charAt(Math.floor(Math.random() * numeros.length));
-        }
-        return codigo;
-    };
+    const handleVolver = async () => {
+        try {
+            const token = localStorage.getItem("token");
 
-    const handleVolver = () => {
-        localStorage.removeItem("reserva");
-        localStorage.removeItem("codigoSeguimiento");
-        navigate("/");
+            if (!token) {
+                alert("Debes estar logueado para guardar la factura.");
+                return;
+            }
+
+            const facturaData = JSON.parse(localStorage.getItem("facturaData")) || {};
+            let numeroFactura = localStorage.getItem("codigoSeguimiento") || generarCodigo();
+
+            console.log("📌 Datos de factura antes de enviar:", facturaData);
+
+            if (!facturaData.id_venta || !facturaData.total) {
+                console.error("❌ Error: La factura no tiene los datos necesarios.");
+                alert("Hubo un problema con la compra. Verifica que se haya procesado correctamente.");
+                return;
+            }
+
+            const facturaFinal = {
+                ...facturaData,
+                numero_factura: numeroFactura,
+            };
+
+            const res = await fetch(`${API_BASE}/facturas`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(facturaFinal),
+            });
+
+            if (!res.ok) {
+                throw new Error("Error al guardar la factura");
+            }
+
+            console.log("📌 Factura guardada correctamente:", facturaFinal);
+
+            localStorage.removeItem("facturaData");
+            localStorage.removeItem("codigoSeguimiento");
+
+            navigate("/");
+        } catch (error) {
+            console.error("Error al procesar la factura:", error);
+        }
     };
 
     return (
@@ -58,7 +88,6 @@ export default function ConfirmacionCompra() {
                             {codigoSeguimiento}
                         </div>
                     </div>
-
 
                     <Boton onClick={handleVolver} className="bg-[#0077B6] hover:bg-[#005F8B] text-white font-medium py-3 px-6 rounded-md shadow-md">
                         Volver al inicio

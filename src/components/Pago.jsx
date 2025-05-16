@@ -1,4 +1,3 @@
-import {useState } from "react";
 import Button from "../components/ComponentesExternos/Boton";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -6,7 +5,6 @@ import { useEffect } from "react";
 import { useRef } from "react";
 
 const Pago = () => {
-  const [showCardNumber, setShowCardNumber] = useState(false);
   const navigate = useNavigate();
 
   const reserva = JSON.parse(localStorage.getItem("reserva")) ?? {};
@@ -34,6 +32,18 @@ const Pago = () => {
     }));
   }, []);
 
+  const generarCodigo = () => {
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numeros = "0123456789";
+    let codigo = "";
+    for (let i = 0; i < 3; i++) {
+      codigo += letras.charAt(Math.floor(Math.random() * letras.length));
+    }
+    for (let i = 0; i < 5; i++) {
+      codigo += numeros.charAt(Math.floor(Math.random() * numeros.length));
+    }
+    return codigo;
+  };
 
   const handleCompra = async () => {
     const form = formRef.current;
@@ -51,14 +61,17 @@ const Pago = () => {
     try {
       const reservaData = JSON.parse(localStorage.getItem("reserva"));
       const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
 
-      if (!reservaData || !reservaData.pelicula || !reservaData.horario || !reservaData.id_horario || !reservaData.butacas.length) {
-        console.error("Error: Datos insuficientes para realizar la compra.");
+      if (!reservaData?.pelicula || !reservaData?.horario || !reservaData?.id_horario || !reservaData?.butacas.length) {
+        console.error("❌ Error: Datos insuficientes para realizar la compra.");
+        alert("Faltan datos en la reserva. Verifica antes de continuar.");
         return;
       }
 
-      if (!user?.id || !localStorage.getItem("token")) {
-        console.error("Error: Usuario no autenticado.");
+      if (!user?.id || !token) {
+        console.error("❌ Error: Usuario no autenticado.");
+        alert("Debes iniciar sesión para completar la compra.");
         return;
       }
 
@@ -66,7 +79,7 @@ const Pago = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           id_user: user.id,
@@ -75,11 +88,18 @@ const Pago = () => {
       });
 
       if (!reservaResponse.ok) {
-        console.error("Error al registrar la reserva.");
+        console.error("❌ Error al registrar la reserva.");
         return;
       }
 
       const nuevaReserva = await reservaResponse.json();
+      let totalCompra = reservaData.butacas.length * precioEntrada;
+
+      let numeroFactura = localStorage.getItem("codigoSeguimiento");
+      if (!numeroFactura) {
+        numeroFactura = generarCodigo();
+        localStorage.setItem("codigoSeguimiento", numeroFactura);
+      }
 
       let ventasExitosas = true;
       await Promise.all(
@@ -88,24 +108,24 @@ const Pago = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
               id_reserva: nuevaReserva.reserva.id_reserva,
               id_butaca: butaca.id_butaca,
-              total: reservaData.butacas.length * precioEntrada,
+              total: precioEntrada,
             }),
           });
 
           if (!ventaResponse.ok) {
-            console.error(`Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+            console.error(`❌ Error al registrar la venta de la butaca ${butaca.id_butaca}`);
             ventasExitosas = false;
           }
         })
       );
 
       if (!ventasExitosas) {
-        console.error("Algunas ventas no fueron registradas correctamente.");
+        console.error("❌ Algunas ventas no fueron registradas correctamente.");
         return;
       }
 
@@ -116,27 +136,35 @@ const Pago = () => {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ estado: "ocupada" }),
           });
 
           if (!updateButacaResponse.ok) {
-            console.error(`Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
+            console.error(`❌ Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
             actualizacionesExitosas = false;
           }
         })
       );
 
       if (!actualizacionesExitosas) {
-        console.error("Algunas butacas no fueron actualizadas correctamente.");
+        console.error("❌ Algunas butacas no fueron actualizadas correctamente.");
         return;
       }
 
-      localStorage.removeItem("reserva");
+      const facturaData = {
+        id_venta: nuevaReserva.reserva.id_reserva,
+        total: totalCompra,
+        numero_factura: numeroFactura, 
+      };
+
+      console.log("📌 Datos de factura guardados en `localStorage`:", facturaData);
+      localStorage.setItem("facturaData", JSON.stringify(facturaData));
+
       navigate("/confirmacion-compra");
     } catch (error) {
-      console.error("Error en el proceso de compra:", error);
+      console.error("❌ Error en el proceso de compra:", error);
     }
   };
 
@@ -232,7 +260,7 @@ const Pago = () => {
                   <div className="relative">
                     <label className="text-lg text-white">Número de tarjeta</label>
                     <input
-                      type={showCardNumber ? "text" : ""}
+                      type="text"
                       className="w-full px-3 py-2 pr-10 rounded-md bg-neutral-800 border border-neutral-600 text-white"
                       maxLength={19}
                       required

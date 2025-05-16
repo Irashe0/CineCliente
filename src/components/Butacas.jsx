@@ -30,7 +30,7 @@ export default function Butacas() {
   useEffect(() => {
     const fetchButacas = async () => {
       try {
-        const res = await fetch(`${API_BASE}/butacas/sala/${sala}/horario/${id_horario}`);
+        const res = await fetch(`${API_BASE}/butacas/sala/2/horario/153`);
         if (!res.ok) throw new Error("Error al obtener butacas");
         const data = await res.json();
 
