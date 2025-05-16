@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Search, X, CircleUserRound } from "lucide-react" // Importamos el ícono
+import { Search, X, CircleUserRound } from "lucide-react" 
 import { Link, useNavigate } from "react-router-dom"
 
 const Header = () => {

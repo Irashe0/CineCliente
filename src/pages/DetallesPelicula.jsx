@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Boton from "../components/ComponentesExternos/Boton";
 import imagen from "../assets/PlaceHolder.webp";
-import banner from "../assets/Banner1.jpg";
+import banner from "../assets/banner-placeholder.jpg";
 
 export default function MovieDetails() {
   const { id } = useParams();

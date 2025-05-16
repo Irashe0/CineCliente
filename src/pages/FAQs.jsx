@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
-import CinemaLuxeBackground from "../components/ComponentesExternos/bg"; 
 
 const faqs = [
   {
@@ -38,7 +37,6 @@ export default function FAQs() {
 
   return (
     <>
-    <CinemaLuxeBackground/>
       <Header className="fixed top-0 left-0 w-full z-50" />
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br p-4">
         <div className="absolute top-6 left-0 right-0 mt-40 text-center">

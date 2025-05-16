@@ -22,7 +22,10 @@
 body {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 1.2rem;
-  background-color: #0f0f0f;
+  background: url('../assets/bg.jpeg') no-repeat center center fixed;
+  background-size: cover; 
+  background-position: center; 
+  background-attachment: fixed; 
   color: rgb(var(--foreground-rgb));
   line-height: 1.6;
   margin: 0;
@@ -30,7 +33,18 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
 }
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(15, 15, 15, 0.5); 
+  z-index: -1;
+}
+
+
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;

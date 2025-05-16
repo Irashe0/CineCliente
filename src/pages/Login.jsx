@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom"
 import Boton from "../components/ComponentesExternos/Boton"
-import CinemaLuxeBackground from "../components/ComponentesExternos/bg"; 
+import Header from "../components/Header"
+import Footer from "../components/Footer"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -61,13 +61,8 @@ export default function Login() {
   
   return (
     <>
-      <CinemaLuxeBackground/>
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
-        <div className="absolute top-6 left-0 right-0 text-center">
-          <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
-            CineLuxe
-          </Link>
-        </div>
+    <Header />
+      <div className="flex min-h-screen items-center justify-center p-4">
 
         <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] border-opacity-50">
           <div className="bg-gradient-to-t from-[#0F0F0F] to-[#1E1E1E] p-6 flex flex-col items-center">
@@ -121,6 +116,7 @@ export default function Login() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   )
 }

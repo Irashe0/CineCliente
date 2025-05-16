@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Boton from "../components/ComponentesExternos/Boton";
-import CinemaLuxeBackground from "../components/ComponentesExternos/bg";
-import Header from "../components/Header";
 
 export default function ConfirmacionCompra() {
     const navigate = useNavigate();
@@ -42,6 +40,7 @@ export default function ConfirmacionCompra() {
                 return;
             }
 
+
             const facturaFinal = {
                 ...facturaData,
                 numero_factura: numeroFactura,
@@ -55,10 +54,9 @@ export default function ConfirmacionCompra() {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(facturaFinal),
+                
             });
-
-            console.log("Factura Final:", facturaFinal);
-
+console.log("Factura Final:", facturaFinal);
             if (!res.ok) {
                 throw new Error("Error al guardar la factura");
             }
@@ -72,11 +70,17 @@ export default function ConfirmacionCompra() {
         }
     };
 
-    return (
-        <CinemaLuxeBackground> 
-            <Header />
 
-            <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] relative z-10">
+
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1A1A2E] via-[#82642b] to-[#1A1A2E] p-4">
+            <div className="absolute top-6 left-0 right-0 text-center">
+                <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
+                    CineLuxe
+                </Link>
+            </div>
+
+            <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] border-opacity-50">
                 <div className="bg-gradient-to-t from-[#0F0F0F] to-[#1E1E1E] p-6 flex flex-col items-center">
                     <h2 className="text-2xl font-serif text-center font-bold text-[#E0E0E0] mb-3">
                         ¡Compra Realizada con éxito!
@@ -96,6 +100,6 @@ export default function ConfirmacionCompra() {
                     </Boton>
                 </div>
             </div>
-        </CinemaLuxeBackground>
+        </div>
     );
 }
