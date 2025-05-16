@@ -57,7 +57,7 @@ export default function Breadcrumbs() {
 
   return (
     <nav aria-label="Progreso de reserva">
-      <ol className="flex flex-wrap items-center justify-center gap-1 md:gap-2 text-sm md:text-base">
+      <ol className="flex flex-wrap items-center justify-center gap-1 md:gap-2 text-sm md:text-base text-white">
         {steps.map((step, index) => (
           <li key={step.name} className="flex items-center">
             {index > 0 && (
@@ -82,7 +82,7 @@ export default function Breadcrumbs() {
               </div>
 
               {step.disabled ? (
-                <span className="ml-2 select-none">{step.name}</span> // Sin link, texto gris
+                <span className="ml-2 select-none">{step.name}</span> 
               ) : (
                 <Link to={step.href} className="ml-2 text-[var(--principal)]">
                   {step.name}

@@ -118,7 +118,7 @@ export default function Butacas() {
               {i === PASILLO_HORIZ && <div className="h-4 sm:h-6" />}
 
               <div className="flex justify-center items-center gap-2">
-                <div className="w-8 h-8 flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 flex items-center justify-center text-sm font-bold text-white">
                   {i + 1}
                 </div>
 
