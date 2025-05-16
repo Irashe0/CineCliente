@@ -60,6 +60,30 @@ export default function Butacas() {
     return butacasGrid;
   }, [butacas]);
 
+  const handleContinuar = () => {
+    if (selectedButacas.length === 0) {
+      alert("Selecciona al menos una butaca.");
+      return;
+    }
+
+    if (selectedButacas.length > 5) {
+      alert("No puedes seleccionar más de 5 butacas.");
+      return;
+    }
+
+    const butacasSeleccionadas = butacas
+      .filter((b) => selectedButacas.includes(b.id_butaca))
+      .map(({ id_butaca, fila, numero }) => ({ id_butaca, fila, numero }));
+
+    const updatedReserva = { ...reserva, butacas: butacasSeleccionadas };
+
+    console.log("📌 Reserva actualizada:", updatedReserva); 
+    localStorage.setItem("reserva", JSON.stringify(updatedReserva));
+
+    navigate(`/reserva/${pelicula?.id_pelicula}/pago`);
+  };
+
+
   return (
     <div className="space-y-6 px-4 py-6 sm:px-6 md:px-10 lg:px-20">
       <h2 className="text-center text-xl sm:text-2xl font-bold text-[var(--texto-primario)]">Selecciona tus butacas</h2>
@@ -73,45 +97,44 @@ export default function Butacas() {
         </div>
 
         <div className="space-y-2">
-  {filas.map((fila, i) => (
-    <div key={i} className="flex justify-center flex-wrap gap-1 sm:gap-3">
-      {fila.map((butaca, j) =>
-        butaca?.tipo === "label" ? (
-          <div
-            key={`label-${i}-${j}`}
-            className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-sm sm:text-lg"
-          >
-            {butaca.valor}
-          </div>
-        ) : butaca ? (
-          <button
-            key={butaca.id_butaca}
-            onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
-            className={`flex justify-center items-center p-1 sm:p-2 rounded border border-[var(--borde-suave)] ${
-              butaca.estado === "Ocupada" || butaca.estado === "Reservada"
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
-          >
-            <Armchair
-              className="h-5 w-5 sm:h-7 sm:w-7"
-              color={
-                selectedButacas.includes(butaca.id_butaca)
-                  ? "#CDAA7D"
-                  : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
-                  ? "#a3a2a2"
-                  : "#EDE6D6"
-              }
-            />
-          </button>
-        ) : (
-          <div key={`pasillo-${i}-${j}`} className="w-10 h-10 sm:w-12 sm:h-12"></div>
-        )
-      )}
-    </div>
-  ))}
-</div>
+          {filas.map((fila, i) => (
+            <div key={i} className="flex justify-center flex-wrap gap-1 sm:gap-3">
+              {fila.map((butaca, j) =>
+                butaca?.tipo === "label" ? (
+                  <div
+                    key={`label-${i}-${j}`}
+                    className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-sm sm:text-lg"
+                  >
+                    {butaca.valor}
+                  </div>
+                ) : butaca ? (
+                  <button
+                    key={butaca.id_butaca}
+                    onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
+                    className={`flex justify-center items-center p-1 sm:p-2 rounded border border-[var(--borde-suave)] ${butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                      }`}
+                    disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
+                  >
+                    <Armchair
+                      className="h-5 w-5 sm:h-7 sm:w-7"
+                      color={
+                        selectedButacas.includes(butaca.id_butaca)
+                          ? "#CDAA7D"
+                          : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                            ? "#a3a2a2"
+                            : "#EDE6D6"
+                      }
+                    />
+                  </button>
+                ) : (
+                  <div key={`pasillo-${i}-${j}`} className="w-10 h-10 sm:w-12 sm:h-12"></div>
+                )
+              )}
+            </div>
+          ))}
+        </div>
 
       </div>
 
@@ -124,12 +147,13 @@ export default function Butacas() {
           Volver
         </Boton>
         <Boton
-          onClick={() => navigate(`/reserva/${pelicula?.id_pelicula}/pago`)}
+          onClick={handleContinuar}
           disabled={selectedButacas.length === 0}
           className="w-full sm:w-auto bg-[var(--principal)] text-white"
         >
           Continuar
         </Boton>
+
 
       </div>
     </div>

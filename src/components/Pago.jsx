@@ -13,7 +13,7 @@ const Pago = () => {
   const horarioSeleccionado = reserva?.horario;
   const salaSeleccionada = reserva?.sala ?? "No disponible";
   const butacasSeleccionadas = reserva?.butacas ?? [];
-
+  console.log("Reserva:", reserva);
   const precioEntrada = 8;
   const total = butacasSeleccionadas.length * precioEntrada;
 
@@ -128,7 +128,6 @@ const Pago = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
-      {/* Formulario de Pago */}
       <div className="w-full md:w-2/3 mb-6 md:mb-0">
         <div className="rounded-lg border border-[#3a3a3a] bg-[#14130f] text-white shadow-lg w-full">
           <div className="rounded-t-lg border-b border-[#3a3a3a] p-4">
@@ -138,7 +137,6 @@ const Pago = () => {
             <div className="p-6 space-y-6">
               <form ref={formRef} className="w-full">
                 <div className="space-y-4">
-                  {/* Datos personales */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-lg text-white">Nombre</label>
@@ -205,8 +203,7 @@ const Pago = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Método de pago */}
+                
                 <h3 className="text-[#cdaa7d] text-3xl font-bold mt-10 text-center">Método de Pago</h3>
                 <div className="space-y-4 mt-6">
                   <div>
@@ -277,7 +274,7 @@ const Pago = () => {
             <h4 className="text-lg font-semibold">Película: {selectedPelicula.titulo}</h4>
             <p>Horario: {horarioSeleccionado}</p>
             <p>Sala: {salaSeleccionada}</p>
-            <p>Butacas seleccionadas: {butacasSeleccionadas.map((b) => b.numero).join(", ")}</p>
+            <p>Butacas seleccionadas: {butacasSeleccionadas.map((b) => `${b.fila}${b.numero}`).join(", ")}</p>
             <p>Total: ${total.toFixed(2)}</p>
             <div className="flex justify-center">
               <Button onClick={handleCompra} className="bg-[var(--principal)] text-white py-2 rounded-md text-lg px-6">
