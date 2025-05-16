@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Boton from "../components/ComponentesExternos/Boton";
-import CinemaLuxeBackground from "../components/ComponentesExternos/bg"; 
+import CinemaLuxeBackground from "../components/ComponentesExternos/bg";
+import Header from "../components/Header";
 
 export default function ConfirmacionCompra() {
     const navigate = useNavigate();
@@ -72,14 +73,10 @@ export default function ConfirmacionCompra() {
     };
 
     return (
-        <CinemaLuxeBackground> {/* Envuelve el contenido dentro del fondo */}
-            <div className="absolute top-6 left-0 right-0 text-center">
-                <Link to="/" className="text-4xl font-bold text-[#CDAA7D] hover:text-[#E6CBA8] transition-colors duration-300">
-                    CineLuxe
-                </Link>
-            </div>
+        <CinemaLuxeBackground> 
+            <Header />
 
-            <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D]">
+            <div className="w-full max-w-md rounded-lg overflow-hidden shadow-[rgba(0,0,0,0.25)] border border-[#CDAA7D] relative z-10">
                 <div className="bg-gradient-to-t from-[#0F0F0F] to-[#1E1E1E] p-6 flex flex-col items-center">
                     <h2 className="text-2xl font-serif text-center font-bold text-[#E0E0E0] mb-3">
                         ¡Compra Realizada con éxito!

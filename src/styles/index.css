@@ -7,23 +7,12 @@
   --principal: #CDAA7D; 
   --gris-oscuro: #2D2D2D; 
 
-  --background: linear-gradient(to right, #14130f, #82642b, #14130f); 
   --texto-primario: #EDE6D6; 
   --texto-secundario: #C4A984; 
   
   --borde-suave: rgba(255, 255, 255, 0.2); 
   --hover-efecto: rgba(205, 170, 125, 0.4); 
   
-}
-
-
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
 }
 
 #root {
@@ -33,7 +22,7 @@
 body {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 1.2rem;
-  background: linear-gradient(to right, #14130f, #82642b, #14130f);
+  background-color: #0f0f0f;
   color: rgb(var(--foreground-rgb));
   line-height: 1.6;
   margin: 0;
@@ -106,13 +95,3 @@ section, article, header {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--fondo-oscuro);
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    color: var(--texto-claro);
-  }
-
-}
