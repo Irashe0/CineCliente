@@ -16,6 +16,18 @@ export default function Butacas() {
   const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
 
   useEffect(() => {
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+
+    localStorage.setItem("reservaProgreso", JSON.stringify({
+      ...progreso,
+      cine: progreso.cine ?? true,
+      horario: progreso.horario ?? true,
+      butacas: true,
+      pago: false,
+    }));
+  }, []);
+
+  useEffect(() => {
     const fetchButacas = async () => {
       try {
         const res = await fetch(`${API_BASE}/butacas/sala/${sala}/horario/${id_horario}`);

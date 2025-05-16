@@ -3,7 +3,7 @@ import CinesCard from "./CineCardReserva";
 
 export default function SelectCine() {
   const [cines, setCines] = useState([]);
-  const [peliculaSeleccionada, setPeliculaSeleccionada] = useState(null); 
+  const [peliculaSeleccionada, setPeliculaSeleccionada] = useState(null);
 
   useEffect(() => {
     const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada")) || null;
@@ -21,12 +21,25 @@ export default function SelectCine() {
     fetchCines();
   }, []);
 
+  useEffect(() => {
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso"));
+
+    if (!progreso) {
+      localStorage.setItem("reservaProgreso", JSON.stringify({
+        cine: true,
+        horario: false,
+        butacas: false,
+        pago: false,
+      }));
+    }
+  }, []);
+
   return (
     <>
       {peliculaSeleccionada && peliculaSeleccionada.titulo ? (
         <div className="text-center">
           <h3 className="text-2x1 font-semibold text-white">
-             {peliculaSeleccionada.titulo}
+            {peliculaSeleccionada.titulo}
           </h3>
         </div>
       ) : (

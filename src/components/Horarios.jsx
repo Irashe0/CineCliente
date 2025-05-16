@@ -18,6 +18,18 @@ export default function Horarios() {
   const fechaSeleccionadaDate = fechas.find((f) => f.id === selectedDate)?.fecha;
 
   useEffect(() => {
+  const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+
+  localStorage.setItem("reservaProgreso", JSON.stringify({
+    ...progreso,
+    horario: true,
+    cine: progreso.cine ?? true, 
+    butacas: false,
+    pago: false
+  }));
+}, []);
+
+  useEffect(() => {
     const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
     if (peliculaGuardada) {
       setSelectedPelicula({
@@ -86,6 +98,7 @@ export default function Horarios() {
         titulo: selectedPelicula.titulo,
       },
     };
+
 
     console.log("Reserva guardada en localStorage:", reserva);
     localStorage.setItem("reserva", JSON.stringify(reserva));

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, CreditCardIcon } from "lucide-react";
+import {useState } from "react";
 import Button from "../components/ComponentesExternos/Boton";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 import { useRef } from "react";
 
 const Pago = () => {
@@ -20,6 +21,19 @@ const Pago = () => {
   const API_BASE = import.meta.env.VITE_API_URL;
 
   const formRef = useRef(null);
+
+  useEffect(() => {
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+
+    localStorage.setItem("reservaProgreso", JSON.stringify({
+      ...progreso,
+      cine: progreso.cine ?? true,
+      horario: progreso.horario ?? true,
+      butacas: progreso.butacas ?? true,
+      pago: true,
+    }));
+  }, []);
+
 
   const handleCompra = async () => {
     const form = formRef.current;
