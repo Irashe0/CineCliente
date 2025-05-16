@@ -38,7 +38,7 @@ export default function Login() {
       });
   
       const userData = await userResponse.json();
-  
+
       if (userResponse.ok) {
         localStorage.setItem("user", JSON.stringify({
           id: userData.id,

@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Armchair } from "lucide-react";
 import Boton from "../components/ComponentesExternos/Boton";
 
+const FILAS = 10;
+const COLUMNAS_GRID = 7;
+const PASILLO_HORIZ = 5;
+
 export default function Butacas() {
   const navigate = useNavigate();
   const [butacas, setButacas] = useState([]);
@@ -12,19 +16,6 @@ export default function Butacas() {
   const { sala, horario, pelicula, id_horario } = reserva;
 
   const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
-
-  useEffect(() => {
-    if (pelicula?.id_pelicula && !pelicula?.titulo) {
-      const updatedReserva = {
-        ...reserva,
-        pelicula: {
-          id_pelicula: pelicula.id_pelicula,
-          titulo: pelicula.nombre ?? "No disponible",
-        },
-      };
-      localStorage.setItem("reserva", JSON.stringify(updatedReserva));
-    }
-  }, [pelicula]);
 
   useEffect(() => {
     const fetchButacas = async () => {
@@ -48,73 +39,26 @@ export default function Butacas() {
   };
 
   const filas = useMemo(() => {
-    const filaMapping = { A: 0, B: 1, C: 2, D: 3, E: 4 };
-    const tempFilas = [];
+    let contador = 0;
+    const butacasGrid = Array.from({ length: FILAS }, () => []);
 
-    butacas.forEach((butaca) => {
-      const index = filaMapping[butaca.fila];
-      if (index !== undefined) {
-        if (!tempFilas[index]) tempFilas[index] = [];
-        tempFilas[index].push(butaca);
+    for (let fila = 0; fila < FILAS; fila++) {
+      if (fila === PASILLO_HORIZ) {
+        butacasGrid[fila] = Array(COLUMNAS_GRID).fill(null);
       }
-    });
 
-    return tempFilas;
+      for (let col = 0; col < COLUMNAS_GRID; col++) {
+        if (col === 0 || col === COLUMNAS_GRID - 1) {
+          butacasGrid[fila][col] = { tipo: "label", valor: fila + 1 };
+        } else if (contador < butacas.length) {
+          butacasGrid[fila][col] = butacas[contador];
+          contador++;
+        }
+      }
+    }
+
+    return butacasGrid;
   }, [butacas]);
-
-  const handleContinuar = async () => {
-    if (selectedButacas.length === 0) {
-      alert("Selecciona al menos una butaca.");
-      return;
-    }
-    if (selectedButacas.length > 5) {
-      alert("No puedes seleccionar más de 5 butacas.");
-      return;
-    }
-
-    try {
-      await Promise.all(
-        selectedButacas.map(async (id_butaca) => {
-          const res = await fetch(`${API_BASE}/butacas/${id_butaca}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${localStorage.getItem("token")}`,
-              "X-Requested-With": "XMLHttpRequest",
-            },
-            body: JSON.stringify({ estado: "Reservada" }),
-          });
-
-          const responseData = await res.json();
-          console.log("Detalles del error:", responseData?.detalles);
-
-          if (!res.ok) throw new Error(`Error al reservar butaca ${id_butaca}: ${JSON.stringify(responseData.detalles)}`);
-        })
-      );
-
-      const butacasSeleccionadas = butacas
-        .filter((b) => selectedButacas.includes(b.id_butaca))
-        .map(({ id_butaca, fila, numero }) => ({ id_butaca, fila, numero }));
-
-      if (!id_horario) {
-        console.error("Error: `id_horario` no está disponible en la reserva.");
-        alert("Error en la selección de horario. Vuelve a intentarlo.");
-        return;
-      }
-
-      const updatedReserva = { ...reserva, butacas: butacasSeleccionadas };
-
-      console.log("Reserva guardada en localStorage:", updatedReserva);
-
-      localStorage.setItem("reserva", JSON.stringify(updatedReserva));
-
-      navigate(`/reserva/${pelicula?.id_pelicula}/pago`);
-
-    } catch (err) {
-      console.error("Error durante la reserva de butacas:", err);
-      alert("Ocurrió un error al reservar las butacas. Intenta de nuevo.");
-    }
-  };
 
   return (
     <div className="space-y-6 px-4 py-6 sm:px-6 md:px-10 lg:px-20">
@@ -131,29 +75,36 @@ export default function Butacas() {
         <div className="space-y-2">
           {filas.map((fila, i) => (
             <div key={i} className="flex justify-center flex-wrap gap-3">
-              {fila.map((butaca) => (
-                <button
-                  key={butaca.id_butaca}
-                  onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
-                  className={`flex justify-center items-center p-2 rounded border border-[var(--borde-suave)] ${
-                    butaca.estado === "Ocupada" || butaca.estado === "Reservada"
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }`}
-                  disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
-                >
-                  <Armchair
-                    className="h-6 w-6 sm:h-7 sm:w-7"
-                    color={
-                      selectedButacas.includes(butaca.id_butaca)
-                        ? "#CDAA7D"
-                        : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
-                          ? "#a3a2a2"
-                          : "#EDE6D6"
-                    }
-                  />
-                </button>
-              ))}
+              {fila.map((butaca, j) =>
+                butaca?.tipo === "label" ? (
+                  <div key={`label-${i}-${j}`} className="w-12 h-12 flex items-center justify-center text-lg">
+                    {butaca.valor}
+                  </div>
+                ) : butaca ? (
+                  <button
+                    key={butaca.id_butaca}
+                    onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
+                    className={`flex justify-center items-center p-2 rounded border border-[var(--borde-suave)] ${butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                      }`}
+                    disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
+                  >
+                    <Armchair
+                      className="h-6 w-6 sm:h-7 sm:w-7"
+                      color={
+                        selectedButacas.includes(butaca.id_butaca)
+                          ? "#CDAA7D"
+                          : butaca.estado === "Ocupada" || butaca.estado === "Reservada"
+                            ? "#a3a2a2"
+                            : "#EDE6D6"
+                      }
+                    />
+                  </button>
+                ) : (
+                  <div key={`pasillo-${i}-${j}`} className="w-12 h-12"></div>
+                )
+              )}
             </div>
           ))}
         </div>
@@ -168,12 +119,13 @@ export default function Butacas() {
           Volver
         </Boton>
         <Boton
-          onClick={handleContinuar}
+          onClick={() => navigate(`/reserva/${pelicula?.id_pelicula}/pago`)}
           disabled={selectedButacas.length === 0}
           className="w-full sm:w-auto bg-[var(--principal)] text-white"
         >
           Continuar
         </Boton>
+
       </div>
     </div>
   );

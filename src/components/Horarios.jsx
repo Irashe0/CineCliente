@@ -94,7 +94,6 @@ export default function Horarios() {
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      {/* Botones de fechas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
         {fechas.map((fecha) => (
           <button
@@ -110,7 +109,6 @@ export default function Horarios() {
         ))}
       </div>
 
-      {/* Horarios */}
       <div className="space-y-6">
         {selectedPelicula && peliculas.length > 0 && peliculas[0].horarios.length > 0 ? (
           <div key={peliculas[0].id_pelicula} className="border rounded-lg overflow-hidden p-4">
@@ -141,7 +139,6 @@ export default function Horarios() {
         )}
       </div>
 
-      {/* Botones de acción */}
       <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-8">
         <Boton onClick={() => navigate("/reserva/cine")} variante="outline">
           Volver
