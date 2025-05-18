@@ -137,6 +137,8 @@ const handleCompra = async () => {
       return;
     }
 
+    console.log("API_BASE:", API_BASE);
+
     await Promise.all(
       ventaIds.map(async (id_venta) => {
         const facturaResponse = await fetch(`${API_BASE}/facturas`, {
