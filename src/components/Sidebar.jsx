@@ -15,7 +15,7 @@ export default function Sidebar({ user, selected, onSelect }) {
   }
 
   return (
-    <aside className="flex flex-col p-6 h-full justify-center lg:justify-start">
+    <aside className="flex flex-col p-6 h-full justify-center lg:justify-start bg-[#0F0F0F]">
       <div className="flex flex-col items-center">
         <UserCircle className="h-16 w-16 text-gray-500 mb-2" />
         {user && (
@@ -62,7 +62,7 @@ export default function Sidebar({ user, selected, onSelect }) {
             <button
               onClick={() => onSelect("entradas")}
               className={`w-full text-left flex items-center px-4 py-3 rounded-full font-semibold transition ${
-                selected === "reservas" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
+                selected === "entradas" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
               }`}
             >
               <Ticket className="mr-3" /> Mis Entradas

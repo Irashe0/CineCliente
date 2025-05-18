@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 
+const bannerPlaceholder = "https://apeadero.es/wp-content/uploads/cinema-500x375.jpg";
+
 export default function MisEntradas() {
   const [reservasDetalle, setReservasDetalle] = useState([]);
   const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
 
   useEffect(() => {
-    const fetchReservasConMultimedia = async () => {
+    const fetchReservas = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Token no encontrado. Inicia sesión.");
@@ -28,11 +30,11 @@ export default function MisEntradas() {
             acc[key] = {
               numero_factura: key,
               pelicula: item.pelicula,
-              id_pelicula: item.id_pelicula,
               horario: item.horario,
               sala: item.sala,
               butacas: [],
               precioTotal: 0,
+              banner: bannerPlaceholder,
             };
           }
           acc[key].butacas.push(`${item.butacas.fila}${item.butacas.numero}`);
@@ -40,22 +42,18 @@ export default function MisEntradas() {
           return acc;
         }, {});
 
-        const reservasArray = Object.values(agrupado);
-
-        setReservasDetalle(reservasArray);
+        setReservasDetalle(Object.values(agrupado));
       } catch (error) {
         console.error("Error al obtener datos:", error);
       }
     };
 
-    fetchReservasConMultimedia();
+    fetchReservas();
   }, []);
 
   return (
     <>
-      <Header />
-
-      <div className="flex min-h-screen items-center justify-center p-6 bg-[#0F0F0F]">
+      <div className="flex min-h-screen items-center justify-center p-6">
         <div className="flex flex-wrap gap-6 justify-center w-full">
           {reservasDetalle.length === 0 ? (
             <p className="text-center text-gray-500 w-full">No hay entradas disponibles.</p>
@@ -63,13 +61,19 @@ export default function MisEntradas() {
             reservasDetalle.map((entrada, idx) => (
               <div
                 key={idx}
-                className="relative bg-[#1E1E1E] text-[#E0E0E0] border border-[#CDAA7D] rounded-lg shadow-lg w-80 overflow-hidden"
+                className="relative bg-[#1E1E1E] text-[#E0E0E0] border border-[#CDAA7D] rounded-lg shadow-lg w-96 overflow-hidden"
               >
-                {/* Quitar banner y gradiente */}
-                <div className="p-4 text-left">
-                  <h3 className="text-xl font-bold text-[#CDAA7D] mb-2">🎬 {entrada.pelicula}</h3>
-                  <p><strong>Factura:</strong> {entrada.numero_factura}</p>
-                  <p>
+                {/* Banner con título y gradiente */}
+                <div className="relative w-full h-40">
+                  <img src={entrada.banner} alt={`Banner de ${entrada.pelicula}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                  <h3 className="absolute bottom-4 left-4 text-2xl font-bold text-white">{entrada.pelicula}</h3>
+                </div>
+
+                {/* Detalles alineados a la izquierda */}
+                <div className="p-6 text-left space-y-2">
+                  <p className="font-semibold"><strong>Factura:</strong> {entrada.numero_factura}</p>
+                  <p className="font-semibold">
                     <strong>Horario:</strong>{" "}
                     {new Date(entrada.horario).toLocaleString("es-ES", {
                       day: "2-digit",
@@ -79,9 +83,9 @@ export default function MisEntradas() {
                       minute: "2-digit",
                     })}
                   </p>
-                  <p><strong>Sala:</strong> {entrada.sala}</p>
-                  <p><strong>Butacas:</strong> {entrada.butacas.join(", ")}</p>
-                  <p className="text-lg font-bold">
+                  <p className="font-semibold"><strong>Sala:</strong> {entrada.sala}</p>
+                  <p className="font-semibold"><strong>Butacas:</strong> {entrada.butacas.join(", ")}</p>
+                  <p className="text-xl font-bold text-[#CDAA7D]">
                     <strong>Precio Total:</strong> {entrada.precioTotal.toFixed(2)} €
                   </p>
                 </div>
