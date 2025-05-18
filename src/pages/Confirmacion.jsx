@@ -14,7 +14,6 @@ export default function ConfirmacionCompra() {
     }, []);
 
     const handleVolver = () => {
-        // Limpio localStorage si quieres, o solo navego al inicio
         localStorage.removeItem("codigoSeguimiento");
         localStorage.removeItem("facturaData");
         navigate("/");

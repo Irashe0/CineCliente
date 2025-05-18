@@ -60,12 +60,12 @@ export default function Sidebar({ user, selected, onSelect }) {
           </li>
                     <li>
             <button
-              onClick={() => onSelect("configuracion")}
+              onClick={() => onSelect("entradas")}
               className={`w-full text-left flex items-center px-4 py-3 rounded-full font-semibold transition ${
                 selected === "reservas" ? "bg-[#C1A362] text-black" : "text-white hover:bg-[#2D2D2D]"
               }`}
             >
-              <Ticket className="mr-3" /> Mis reservas
+              <Ticket className="mr-3" /> Mis Entradas
             </button>
           </li>
         </ul>

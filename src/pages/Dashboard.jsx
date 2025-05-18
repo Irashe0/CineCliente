@@ -75,6 +75,7 @@ export default function Dashboard() {
         {page === "perfil" && <Perfil user={user} />}
         {page === "configuracion" && <Configuracion user={user} />}
         {page === "reservas" && <Reservas user={user} />}
+        {page === "entradas" && <MisEntradas user={user} />}
       </main>
 
       <Footer className="col-span-2" />
