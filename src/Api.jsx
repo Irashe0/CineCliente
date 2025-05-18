@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "/api",
 });
 
-export const loginUser = async (email, password) => {
-    return api.post("/login", { email, password });
-};
+export const loginUser = (email, password) => api.post("/login", { email, password });
 
-export const getUser = async (token) => {
-    return api.get("/user", { headers: { Authorization: `Bearer ${token}` } });
+export const getUser = (token) =>
+  api.get("/user", { headers: { Authorization: `Bearer ${token}` } });
+
+export const setAuthToken = (token) => {
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 };
