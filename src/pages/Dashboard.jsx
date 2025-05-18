@@ -6,6 +6,7 @@ import Sidebar from "../components/Sidebar"
 import Perfil from "../components/DashboardPerfil"
 import Configuracion from "../components/DashboardConfiguracion"
 import Reservas from "../components/MisReservas"
+import MisEntradas from "../components/MisEntradas"
 import Footer from "../components/Footer"
 import { AlignJustify, X } from "lucide-react"
 
