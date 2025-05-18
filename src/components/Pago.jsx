@@ -65,7 +65,6 @@ const Pago = () => {
         return;
       }
 
-      // 1. Crear la reserva
       const reservaResponse = await fetch(`${API_BASE}/reservas`, {
         method: "POST",
         headers: {
@@ -81,7 +80,6 @@ const Pago = () => {
       if (!reservaResponse.ok) throw new Error("Error al registrar la reserva.");
       const nuevaReserva = await reservaResponse.json();
 
-      // 2. Crear ventas
       const numeroFactura = generarCodigo();
       localStorage.setItem("codigoSeguimiento", numeroFactura);
       const fecha_venta = new Date().toISOString().split("T")[0];
@@ -117,7 +115,6 @@ const Pago = () => {
         ventaIds.push(id_venta);
       }
 
-      // 3. Crear facturas con el mismo número para todas las ventas
       for (const id_venta of ventaIds) {
         const facturaResponse = await fetch(`${API_BASE}/facturas`, {
           method: "POST",
@@ -139,7 +136,6 @@ const Pago = () => {
         }
       }
 
-      // 4. Actualizar estado de las butacas
       for (const butaca of butacasSeleccionadas) {
         const updateResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
           method: "PUT",
@@ -153,7 +149,6 @@ const Pago = () => {
         if (!updateResponse.ok) throw new Error(`Error al actualizar la butaca ${butaca.id_butaca}`);
       }
 
-      // Guardar datos de factura y navegar a confirmación
       const facturaData = {
         ventas: ventaIds,
         total,
