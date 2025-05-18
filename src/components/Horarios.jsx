@@ -18,16 +18,16 @@ export default function Horarios() {
   const fechaSeleccionadaDate = fechas.find((f) => f.id === selectedDate)?.fecha;
 
   useEffect(() => {
-  const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
 
-  localStorage.setItem("reservaProgreso", JSON.stringify({
-    ...progreso,
-    horario: true,
-    cine: progreso.cine ?? true, 
-    butacas: false,
-    pago: false
-  }));
-}, []);
+    localStorage.setItem("reservaProgreso", JSON.stringify({
+      ...progreso,
+      horario: true,
+      cine: progreso.cine ?? true,
+      butacas: false,
+      pago: false
+    }));
+  }, []);
 
   useEffect(() => {
     const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
@@ -40,38 +40,39 @@ export default function Horarios() {
   }, []);
 
   useEffect(() => {
-    if (!selectedPelicula || !selectedPelicula.id_pelicula) return;
+  if (!selectedPelicula || !selectedPelicula.id_pelicula) return;
 
-    const fetchHorarios = async () => {
-      try {
-        const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
-        const resHorarios = await fetch(`${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`);
-        const horariosData = await resHorarios.json();
+  const fetchHorarios = async () => {
+    try {
+      const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
+      const resHorarios = await fetch(`${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`);
+      const horariosData = await resHorarios.json();
 
-        const ahora = new Date();
-        const fechaSeleccionada = new Date(fechaSeleccionadaDate);
-        fechaSeleccionada.setHours(0, 0, 0, 0);
+      // const ahora = new Date();
+      // const fechaSeleccionada = new Date(fechaSeleccionadaDate);
+      // fechaSeleccionada.setHours(0, 0, 0, 0);
 
-        const horariosFiltrados = horariosData?.filter((h) => {
-          const horarioDate = new Date(h.fecha_hora);
-          const esElDiaSeleccionado =
-            horarioDate >= fechaSeleccionada && horarioDate.toDateString() === fechaSeleccionada.toDateString();
-          const esPosteriorALaHoraActual = horarioDate > ahora;
-          return esElDiaSeleccionado && esPosteriorALaHoraActual;
-        }).map((h) => ({
+      // Mostrar todos los horarios sin filtrar temporalmente
+      let horariosFiltrados = [];
+
+      if (Array.isArray(horariosData)) {
+        horariosFiltrados = horariosData.map((h) => ({
           hora: h.fecha_hora.split("T")[1].slice(0, 5),
           sala: `Sala ${h.id_sala}`,
           id_horario: h.id_horario,
-        })) || [];
-
-        setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
-      } catch (err) {
-        console.error("Error al cargar los horarios:", err);
+        }));
       }
-    };
 
-    fetchHorarios();
-  }, [selectedPelicula, selectedDate]);
+      setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
+    } catch (err) {
+      console.error("Error al cargar los horarios:", err);
+    }
+  };
+
+  fetchHorarios();
+}, [selectedPelicula, selectedDate]);
+
+
 
   const handleContinuar = () => {
     if (!selectedHorario || !selectedPelicula) {
@@ -112,9 +113,8 @@ export default function Horarios() {
           <button
             key={fecha.id}
             onClick={() => setSelectedDate(fecha.id)}
-            className={`flex flex-col items-center border rounded-lg py-2 ${
-              selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
-            }`}
+            className={`flex flex-col items-center border rounded-lg py-2 ${selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
+              }`}
           >
             <span className="font-medium">{fecha.label}</span>
             <span className="text-xs">{fecha.fecha.toLocaleDateString("es-ES")}</span>
@@ -134,11 +134,10 @@ export default function Horarios() {
                   <button
                     key={horarioKey}
                     onClick={() => setSelectedHorario(horarioObj)}
-                    className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${
-                      selectedHorario?.id_horario === horarioObj.id_horario
+                    className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${selectedHorario?.id_horario === horarioObj.id_horario
                         ? "bg-[var(--principal)] text-white"
                         : "bg-white text-gray-700"
-                    }`}
+                      }`}
                   >
                     <span>{horarioObj.hora}</span>
                     <span className="text-gray-500">{horarioObj.sala}</span>

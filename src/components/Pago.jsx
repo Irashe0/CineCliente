@@ -21,161 +21,181 @@ const Pago = () => {
   const formRef = useRef(null);
 
   useEffect(() => {
-    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+  const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
 
-    localStorage.setItem("reservaProgreso", JSON.stringify({
-      ...progreso,
-      cine: progreso.cine ?? true,
-      horario: progreso.horario ?? true,
-      butacas: progreso.butacas ?? true,
-      pago: true,
-    }));
-  }, []);
+  localStorage.setItem("reservaProgreso", JSON.stringify({
+    ...progreso,
+    cine: progreso.cine ?? true,
+    horario: progreso.horario ?? true,
+    butacas: progreso.butacas ?? true,
+    pago: true,
+  }));
+}, []);
 
-  const generarCodigo = () => {
-    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numeros = "0123456789";
-    let codigo = "";
-    for (let i = 0; i < 3; i++) {
-      codigo += letras.charAt(Math.floor(Math.random() * letras.length));
+const generarCodigo = () => {
+  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numeros = "0123456789";
+  let codigo = "";
+  for (let i = 0; i < 3; i++) {
+    codigo += letras.charAt(Math.floor(Math.random() * letras.length));
+  }
+  for (let i = 0; i < 5; i++) {
+    codigo += numeros.charAt(Math.floor(Math.random() * numeros.length));
+  }
+  return codigo;
+};
+
+const handleCompra = async () => {
+  const form = formRef.current;
+  if (!form) return;
+
+  const inputs = form.querySelectorAll("input, select");
+  for (let input of inputs) {
+    if (input.hasAttribute("required") && !input.value.trim()) {
+      alert("Por favor completa todos los campos requeridos.");
+      input.focus();
+      return;
     }
-    for (let i = 0; i < 5; i++) {
-      codigo += numeros.charAt(Math.floor(Math.random() * numeros.length));
-    }
-    return codigo;
-  };
+  }
 
-  const handleCompra = async () => {
-    const form = formRef.current;
-    if (!form) return;
+  try {
+    const reservaData = JSON.parse(localStorage.getItem("reserva"));
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
 
-    const inputs = form.querySelectorAll("input, select");
-    for (let input of inputs) {
-      if (input.hasAttribute("required") && !input.value.trim()) {
-        alert("Por favor completa todos los campos requeridos.");
-        input.focus();
-        return;
-      }
+    if (!reservaData?.pelicula || !reservaData?.horario || !reservaData?.id_horario || !reservaData?.butacas.length) {
+      console.error("❌ Error: Datos insuficientes para realizar la compra.");
+      alert("Faltan datos en la reserva. Verifica antes de continuar.");
+      return;
     }
 
-    try {
-      const reservaData = JSON.parse(localStorage.getItem("reserva"));
-      const user = JSON.parse(localStorage.getItem("user"));
-      const token = localStorage.getItem("token");
-
-      if (!reservaData?.pelicula || !reservaData?.horario || !reservaData?.id_horario || !reservaData?.butacas.length) {
-        console.error("❌ Error: Datos insuficientes para realizar la compra.");
-        alert("Faltan datos en la reserva. Verifica antes de continuar.");
-        return;
-      }
-
-      if (!user?.id || !token) {
-        console.error("❌ Error: Usuario no autenticado.");
-        alert("Debes iniciar sesión para completar la compra.");
-        return;
-      }
-
-      const reservaResponse = await fetch(`${API_BASE}/reservas`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id_user: user.id,
-          id_horario: reservaData.id_horario,
-        }),
-      });
-
-      if (!reservaResponse.ok) {
-        console.error("❌ Error al registrar la reserva.");
-        return;
-      }
-
-      const nuevaReserva = await reservaResponse.json();
-
-      let numeroFactura = localStorage.getItem("codigoSeguimiento");
-      if (!numeroFactura) {
-        numeroFactura = generarCodigo();
-        localStorage.setItem("codigoSeguimiento", numeroFactura);
-      }
-
-      let totalCompra = reservaData.butacas.length * precioEntrada;
-
-      let ventasExitosas = true;
-      const ventaIds = [];
-
-      await Promise.all(
-        reservaData.butacas.map(async (butaca) => {
-          const ventaResponse = await fetch(`${API_BASE}/ventas`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              id_reserva: nuevaReserva.reserva.id_reserva,
-              id_butaca: butaca.id_butaca,
-              total: precioEntrada,
-              numero_factura: numeroFactura, 
-            }),
-          });
-
-          if (ventaResponse.ok) {
-            const ventaData = await ventaResponse.json();
-            ventaIds.push(ventaData.id);
-          } else {
-            console.error(`❌ Error al registrar la venta de la butaca ${butaca.id_butaca}`);
-            ventasExitosas = false;
-          }
-        })
-      );
-
-      if (!ventasExitosas) {
-        console.error("❌ Algunas ventas no fueron registradas correctamente.");
-        return;
-      }
-
-      let actualizacionesExitosas = true;
-      await Promise.all(
-        reservaData.butacas.map(async (butaca) => {
-          const updateButacaResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ estado: "ocupada" }),
-          });
-
-          if (!updateButacaResponse.ok) {
-            console.error(`❌ Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
-            actualizacionesExitosas = false;
-          }
-        })
-      );
-
-      if (!actualizacionesExitosas) {
-        console.error("❌ Algunas butacas no fueron actualizadas correctamente.");
-        return;
-      }
-
-      const facturaData = {
-        ventas: ventaIds,
-        total: totalCompra,
-        numero_factura: numeroFactura,
-      };
-
-      console.log("📌 Datos de factura guardados en `localStorage`:", facturaData);
-      localStorage.setItem("facturaData", JSON.stringify(facturaData));
-
-      navigate("/confirmacion-compra");
-    } catch (error) {
-      console.error("❌ Error en el proceso de compra:", error);
+    if (!user?.id || !token) {
+      console.error("❌ Error: Usuario no autenticado.");
+      alert("Debes iniciar sesión para completar la compra.");
+      return;
     }
-  };
 
+    const reservaResponse = await fetch(`${API_BASE}/reservas`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        id_user: user.id,
+        id_horario: reservaData.id_horario,
+      }),
+    });
 
+    if (!reservaResponse.ok) {
+      console.error("❌ Error al registrar la reserva.");
+      return;
+    }
+
+    const nuevaReserva = await reservaResponse.json();
+
+    let numeroFactura = localStorage.getItem("codigoSeguimiento");
+    if (!numeroFactura) {
+      numeroFactura = generarCodigo();
+      localStorage.setItem("codigoSeguimiento", numeroFactura);
+    }
+
+    let totalCompra = reservaData.butacas.length * precioEntrada;
+    const fecha_venta = new Date().toISOString().split("T")[0];
+
+    let ventasExitosas = true;
+    const ventaIds = [];
+
+    await Promise.all(
+      reservaData.butacas.map(async (butaca) => {
+        const ventaResponse = await fetch(`${API_BASE}/ventas`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            id_reserva: nuevaReserva.reserva.id_reserva,
+            id_butaca: butaca.id_butaca,
+            total: precioEntrada,
+            fecha_venta: fecha_venta,
+          }),
+        });
+
+        if (ventaResponse.ok) {
+          const ventaData = await ventaResponse.json();
+          ventaIds.push(ventaData.id);
+        } else {
+          console.error(`❌ Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+          ventasExitosas = false;
+        }
+      })
+    );
+
+    if (!ventasExitosas) {
+      console.error("❌ Algunas ventas no fueron registradas correctamente.");
+      return;
+    }
+
+    await Promise.all(
+      ventaIds.map(async (id_venta) => {
+        const facturaResponse = await fetch(`${API_BASE}/facturas`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            id_venta,
+            numero_factura: numeroFactura,
+            total: precioEntrada,
+          }),
+        });
+
+        if (!facturaResponse.ok) {
+          console.error(`❌ Error al crear factura para la venta ${id_venta}`);
+        }
+      })
+    );
+
+    let actualizacionesExitosas = true;
+    await Promise.all(
+      reservaData.butacas.map(async (butaca) => {
+        const updateButacaResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ estado: "ocupada" }),
+        });
+
+        if (!updateButacaResponse.ok) {
+          console.error(`❌ Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
+          actualizacionesExitosas = false;
+        }
+      })
+    );
+
+    if (!actualizacionesExitosas) {
+      console.error("❌ Algunas butacas no fueron actualizadas correctamente.");
+      return;
+    }
+
+    const facturaData = {
+      ventas: ventaIds,
+      total: totalCompra,
+      numero_factura: numeroFactura,
+    };
+
+    console.log("📌 Datos de factura guardados en `localStorage`:", facturaData);
+    localStorage.setItem("facturaData", JSON.stringify(facturaData));
+
+    navigate("/confirmacion-compra");
+  } catch (error) {
+    console.error("❌ Error en el proceso de compra:", error);
+  }
+};
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
