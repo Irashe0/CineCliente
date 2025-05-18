@@ -1,114 +1,96 @@
-import Button from "../components/ComponentesExternos/Boton";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-
-import { useRef } from "react";
+import Button from "../components/ComponentesExternos/Boton";
 
 const Pago = () => {
   const navigate = useNavigate();
+  const formRef = useRef(null);
 
   const reserva = JSON.parse(localStorage.getItem("reserva")) ?? {};
-  const selectedPelicula = reserva?.pelicula ?? {};
-  const horarioSeleccionado = reserva?.horario;
-  const salaSeleccionada = reserva?.sala ?? "No disponible";
-  const butacasSeleccionadas = reserva?.butacas ?? [];
-  console.log("Reserva:", reserva);
+  const selectedPelicula = reserva.pelicula ?? {};
+  const horarioSeleccionado = reserva.horario;
+  const salaSeleccionada = reserva.sala ?? "No disponible";
+  const butacasSeleccionadas = reserva.butacas ?? [];
   const precioEntrada = 8;
   const total = butacasSeleccionadas.length * precioEntrada;
 
   const API_BASE = import.meta.env.VITE_API_URL;
 
-  const formRef = useRef(null);
-
   useEffect(() => {
-  const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+    localStorage.setItem(
+      "reservaProgreso",
+      JSON.stringify({
+        ...progreso,
+        cine: progreso.cine ?? true,
+        horario: progreso.horario ?? true,
+        butacas: progreso.butacas ?? true,
+        pago: true,
+      })
+    );
+  }, []);
 
-  localStorage.setItem("reservaProgreso", JSON.stringify({
-    ...progreso,
-    cine: progreso.cine ?? true,
-    horario: progreso.horario ?? true,
-    butacas: progreso.butacas ?? true,
-    pago: true,
-  }));
-}, []);
+  const generarCodigo = () => {
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numeros = "0123456789";
+    const random = (charset, length) =>
+      Array.from({ length }, () => charset.charAt(Math.floor(Math.random() * charset.length))).join("");
+    return random(letras, 3) + random(numeros, 5);
+  };
 
-const generarCodigo = () => {
-  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const numeros = "0123456789";
-  let codigo = "";
-  for (let i = 0; i < 3; i++) {
-    codigo += letras.charAt(Math.floor(Math.random() * letras.length));
-  }
-  for (let i = 0; i < 5; i++) {
-    codigo += numeros.charAt(Math.floor(Math.random() * numeros.length));
-  }
-  return codigo;
-};
+  const handleCompra = async () => {
+    const form = formRef.current;
+    if (!form) return;
 
-const handleCompra = async () => {
-  const form = formRef.current;
-  if (!form) return;
-
-  const inputs = form.querySelectorAll("input, select");
-  for (let input of inputs) {
-    if (input.hasAttribute("required") && !input.value.trim()) {
-      alert("Por favor completa todos los campos requeridos.");
-      input.focus();
-      return;
-    }
-  }
-
-  try {
-    const reservaData = JSON.parse(localStorage.getItem("reserva"));
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
-
-    if (!reservaData?.pelicula || !reservaData?.horario || !reservaData?.id_horario || !reservaData?.butacas.length) {
-      console.error("❌ Error: Datos insuficientes para realizar la compra.");
-      alert("Faltan datos en la reserva. Verifica antes de continuar.");
-      return;
+    const inputs = form.querySelectorAll("input, select");
+    for (let input of inputs) {
+      if (input.hasAttribute("required") && !input.value.trim()) {
+        alert("Por favor completa todos los campos requeridos.");
+        input.focus();
+        return;
+      }
     }
 
-    if (!user?.id || !token) {
-      console.error("❌ Error: Usuario no autenticado.");
-      alert("Debes iniciar sesión para completar la compra.");
-      return;
-    }
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
 
-    const reservaResponse = await fetch(`${API_BASE}/reservas`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        id_user: user.id,
-        id_horario: reservaData.id_horario,
-      }),
-    });
+      if (!reserva?.pelicula || !reserva?.horario || !reserva?.id_horario || !butacasSeleccionadas.length) {
+        alert("Faltan datos en la reserva. Verifica antes de continuar.");
+        return;
+      }
 
-    if (!reservaResponse.ok) {
-      console.error("❌ Error al registrar la reserva.");
-      return;
-    }
+      if (!user?.id || !token) {
+        alert("Debes iniciar sesión para completar la compra.");
+        return;
+      }
 
-    const nuevaReserva = await reservaResponse.json();
+      console.log(`${API_BASE}/reservas`);
+      console.log("Token:", token);
+      // 1. Crear la reserva
+      const reservaResponse = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/reservas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id_user: user.id,
+          id_horario: reserva.id_horario,
+        }),
+      });
 
-    let numeroFactura = localStorage.getItem("codigoSeguimiento");
-    if (!numeroFactura) {
-      numeroFactura = generarCodigo();
+      if (!reservaResponse.ok) throw new Error("Error al registrar la reserva.");
+      const nuevaReserva = await reservaResponse.json();
+
+      // 2. Crear ventas
+      const numeroFactura = localStorage.getItem("codigoSeguimiento") || generarCodigo();
       localStorage.setItem("codigoSeguimiento", numeroFactura);
-    }
+      const fecha_venta = new Date().toISOString().split("T")[0];
 
-    let totalCompra = reservaData.butacas.length * precioEntrada;
-    const fecha_venta = new Date().toISOString().split("T")[0];
-
-    let ventasExitosas = true;
-    const ventaIds = [];
-
-    await Promise.all(
-      reservaData.butacas.map(async (butaca) => {
-        const ventaResponse = await fetch(`${API_BASE}/ventas`, {
+      const ventaIds = [];
+      for (const butaca of butacasSeleccionadas) {
+        const ventaResponse = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/ventas`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -118,30 +100,18 @@ const handleCompra = async () => {
             id_reserva: nuevaReserva.reserva.id_reserva,
             id_butaca: butaca.id_butaca,
             total: precioEntrada,
-            fecha_venta: fecha_venta,
+            fecha_venta,
           }),
         });
 
-        if (ventaResponse.ok) {
-          const ventaData = await ventaResponse.json();
-          ventaIds.push(ventaData.id);
-        } else {
-          console.error(`❌ Error al registrar la venta de la butaca ${butaca.id_butaca}`);
-          ventasExitosas = false;
-        }
-      })
-    );
+        if (!ventaResponse.ok) throw new Error(`Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+        const ventaData = await ventaResponse.json();
+        ventaIds.push(ventaData.id);
+      }
 
-    if (!ventasExitosas) {
-      console.error("❌ Algunas ventas no fueron registradas correctamente.");
-      return;
-    }
-
-    console.log("API_BASE:", API_BASE);
-
-    await Promise.all(
-      ventaIds.map(async (id_venta) => {
-        const facturaResponse = await fetch(`${API_BASE}/facturas`, {
+      // 3. Crear facturas
+      for (const id_venta of ventaIds) {
+        const facturaResponse = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/facturas`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -154,16 +124,12 @@ const handleCompra = async () => {
           }),
         });
 
-        if (!facturaResponse.ok) {
-          console.error(`❌ Error al crear factura para la venta ${id_venta}`);
-        }
-      })
-    );
+        if (!facturaResponse.ok) throw new Error(`Error al crear factura para la venta ${id_venta}`);
+      }
 
-    let actualizacionesExitosas = true;
-    await Promise.all(
-      reservaData.butacas.map(async (butaca) => {
-        const updateButacaResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
+      // 4. Actualizar estado de las butacas
+      for (const butaca of butacasSeleccionadas) {
+        const updateResponse = await fetch(`${API_BASE}/butacas/${butaca.id_butaca}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -172,32 +138,22 @@ const handleCompra = async () => {
           body: JSON.stringify({ estado: "ocupada" }),
         });
 
-        if (!updateButacaResponse.ok) {
-          console.error(`❌ Error al actualizar el estado de la butaca ${butaca.id_butaca}`);
-          actualizacionesExitosas = false;
-        }
-      })
-    );
+        if (!updateResponse.ok) throw new Error(`Error al actualizar la butaca ${butaca.id_butaca}`);
+      }
 
-    if (!actualizacionesExitosas) {
-      console.error("❌ Algunas butacas no fueron actualizadas correctamente.");
-      return;
+      const facturaData = {
+        ventas: ventaIds,
+        total,
+        numero_factura: numeroFactura,
+      };
+      localStorage.setItem("facturaData", JSON.stringify(facturaData));
+
+      navigate("/confirmacion-compra");
+    } catch (error) {
+      console.error("❌ Error en el proceso de compra:", error);
+      alert("Ocurrió un error durante la compra. Intenta nuevamente.");
     }
-
-    const facturaData = {
-      ventas: ventaIds,
-      total: totalCompra,
-      numero_factura: numeroFactura,
-    };
-
-    console.log("📌 Datos de factura guardados en `localStorage`:", facturaData);
-    localStorage.setItem("facturaData", JSON.stringify(facturaData));
-
-    navigate("/confirmacion-compra");
-  } catch (error) {
-    console.error("❌ Error en el proceso de compra:", error);
-  }
-};
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">

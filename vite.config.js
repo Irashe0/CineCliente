@@ -10,7 +10,6 @@ export default defineConfig({
       "/api": {
         target: "https://laravelcine-cine-zeocca.laravel.cloud",
         changeOrigin: true,
-        secure: false, 
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
