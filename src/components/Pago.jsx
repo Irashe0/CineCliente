@@ -65,10 +65,8 @@ const Pago = () => {
         return;
       }
 
-      console.log(`${API_BASE}/reservas`);
-      console.log("Token:", token);
       // 1. Crear la reserva
-      const reservaResponse = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/reservas`, {
+      const reservaResponse = await fetch(`${API_BASE}/reservas`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -84,13 +82,13 @@ const Pago = () => {
       const nuevaReserva = await reservaResponse.json();
 
       // 2. Crear ventas
-      const numeroFactura = localStorage.getItem("codigoSeguimiento") || generarCodigo();
+      const numeroFactura = generarCodigo();
       localStorage.setItem("codigoSeguimiento", numeroFactura);
       const fecha_venta = new Date().toISOString().split("T")[0];
 
       const ventaIds = [];
       for (const butaca of butacasSeleccionadas) {
-        const ventaResponse = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/ventas`, {
+        const ventaResponse = await fetch(`${API_BASE}/ventas`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -104,14 +102,24 @@ const Pago = () => {
           }),
         });
 
-        if (!ventaResponse.ok) throw new Error(`Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+        if (!ventaResponse.ok) {
+          const errorData = await ventaResponse.json();
+          console.error("❌ Error en la venta:", errorData);
+          throw new Error(`Error al registrar la venta de la butaca ${butaca.id_butaca}`);
+        }
+
         const ventaData = await ventaResponse.json();
-        ventaIds.push(ventaData.id);
+        const id_venta = ventaData?.venta?.id_venta ?? ventaData?.id_venta;
+        if (!id_venta) {
+          console.error("❌ Venta creada pero sin ID válido:", ventaData);
+          throw new Error("Venta sin ID válido");
+        }
+        ventaIds.push(id_venta);
       }
 
-      // 3. Crear facturas
+      // 3. Crear facturas con el mismo número para todas las ventas
       for (const id_venta of ventaIds) {
-        const facturaResponse = await fetch(`https://laravelcine-cine-zeocca.laravel.cloud/api/facturas`, {
+        const facturaResponse = await fetch(`${API_BASE}/facturas`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -124,7 +132,11 @@ const Pago = () => {
           }),
         });
 
-        if (!facturaResponse.ok) throw new Error(`Error al crear factura para la venta ${id_venta}`);
+        if (!facturaResponse.ok) {
+          const errorData = await facturaResponse.json();
+          console.error("❌ Error al crear factura:", errorData);
+          throw new Error(`Error al crear factura para la venta ${id_venta}`);
+        }
       }
 
       // 4. Actualizar estado de las butacas
@@ -141,6 +153,7 @@ const Pago = () => {
         if (!updateResponse.ok) throw new Error(`Error al actualizar la butaca ${butaca.id_butaca}`);
       }
 
+      // Guardar datos de factura y navegar a confirmación
       const facturaData = {
         ventas: ventaIds,
         total,
@@ -155,8 +168,8 @@ const Pago = () => {
     }
   };
 
-  return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
+return (
+  <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
       <div className="w-full md:w-2/3 mb-6 md:mb-0">
         <div className="rounded-lg border border-[#3a3a3a] bg-[#14130f] text-white shadow-lg w-full">
           <div className="rounded-t-lg border-b border-[#3a3a3a] p-4">
