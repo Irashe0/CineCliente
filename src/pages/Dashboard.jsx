@@ -59,7 +59,7 @@ export default function Dashboard() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
 
   return (
-<div className="grid min-h-screen bg-gradient-to-b from-black to-[#242424] text-[#E0E0E0] grid-cols-1 lg:grid-cols-[250px_1fr] grid-rows-[auto_1fr_auto]">
+<div className="grid min-h-screen bg-gradient-to-b from-black to-[#0F0F0F] text-[#E0E0E0] grid-cols-1 lg:grid-cols-[250px_1fr] grid-rows-[auto_1fr_auto]">
 
 
       <button className="lg:hidden fixed top-4 left-4 z-30 text-white" onClick={toggleSidebar}>
