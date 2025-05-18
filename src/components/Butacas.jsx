@@ -18,19 +18,27 @@ export default function Butacas() {
   useEffect(() => {
     const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
 
-    localStorage.setItem("reservaProgreso", JSON.stringify({
-      ...progreso,
-      cine: progreso.cine ?? true,
-      horario: progreso.horario ?? true,
-      butacas: true,
-      pago: false,
-    }));
-  }, []);
+    if (!progreso.horario) {
+      navigate("/reserva/horario", { replace: true });
+    } else {
+      localStorage.setItem(
+        "reservaProgreso",
+        JSON.stringify({
+          ...progreso,
+          cine: progreso.cine,
+          horario: progreso.horario,
+          butacas: true,
+          pago: false,
+        })
+      );
+    }
+  }, [navigate]);
+
 
   useEffect(() => {
     const fetchButacas = async () => {
       try {
-        const res = await fetch(`${API_BASE}/butacas/sala/2/horario/153`);
+        const res = await fetch(`${API_BASE}/butacas/sala/${sala}/horario/${id_horario}`);
         if (!res.ok) throw new Error("Error al obtener butacas");
         const data = await res.json();
 
@@ -81,7 +89,6 @@ export default function Butacas() {
     return butacasPorFila;
   }, [butacas]);
 
-
   const handleContinuar = () => {
     if (selectedButacas.size === 0) {
       alert("Selecciona al menos una butaca.");
@@ -96,6 +103,16 @@ export default function Butacas() {
 
     console.log("📌 Reserva actualizada:", updatedReserva);
     localStorage.setItem("reserva", JSON.stringify(updatedReserva));
+
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+    localStorage.setItem(
+      "reservaProgreso",
+      JSON.stringify({
+        ...progreso,
+        butacas: true,
+        pago: false,
+      })
+    );
 
     navigate(`/reserva/${pelicula?.id_pelicula}/pago`);
   };
@@ -112,15 +129,12 @@ export default function Butacas() {
           Pantalla
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 sm:space-y-0 flex flex-col items-center w-full max-h-[300px] overflow-y-auto sm:max-h-full sm:overflow-visible">
           {Object.entries(filas).map(([filaLabel, butacasFila], i) => (
-            <div key={i}>
+            <div key={i} className="flex flex-wrap items-center justify-center w-full">
               {i === PASILLO_HORIZ && <div className="h-4 sm:h-6" />}
-
-              <div className="flex justify-center items-center gap-2">
-                <div className="w-8 h-8 flex items-center justify-center text-sm font-bold text-white">
-                  {i + 1}
-                </div>
+              <div className="flex flex-row sm:flex-wrap justify-center items-center gap-2 w-full max-w-full">
+                <div className="w-5 h-5 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold text-white">{i + 1}</div>
 
                 {butacasFila.map((butaca, j) => (
                   butaca ? (
@@ -128,9 +142,7 @@ export default function Butacas() {
                       key={j}
                       onClick={() => toggleSeleccionButaca(butaca.id_butaca)}
                       disabled={butaca.estado === "Ocupada" || butaca.estado === "Reservada"}
-                      className={`w-16 h-16 sm:w-20 sm:h-20 border rounded-lg flex items-center justify-center transition-all duration-200
-        ${butaca.estado === "Ocupada" || butaca.estado === "Reservada" ? "opacity-40 cursor-not-allowed" : ""}
-      `}
+                      className={`w-16 h-16 sm:w-20 sm:h-20 border rounded-lg flex items-center justify-center transition-all duration-200 ${butaca.estado === "Ocupada" || butaca.estado === "Reservada" ? "opacity-40 cursor-not-allowed" : ""}`}
                     >
                       <Armchair
                         className="h-6 w-6 sm:h-8 sm:w-8 transition-all duration-200"
@@ -142,16 +154,13 @@ export default function Butacas() {
                   )
                 ))}
 
-
-                <div className="w-10 h-10 text-lg font-bold text-white flex items-center justify-center">
-                  {i + 1}
-                </div>
-
-
+                <div className="w-5 h-5 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm font-bold text-white">{i + 1}</div>
               </div>
             </div>
           ))}
         </div>
+
+
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">

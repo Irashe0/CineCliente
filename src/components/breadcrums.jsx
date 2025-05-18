@@ -6,22 +6,41 @@ export default function Breadcrumbs() {
   const location = useLocation();
   const pathname = location.pathname;
   const { id } = useParams();
-  
+
   const [progreso, setProgreso] = useState({
-    cine: false,
+    cine: true,      // Inicialmente solo cine está true
     horario: false,
     butacas: false,
     pago: false,
   });
 
   useEffect(() => {
-    const progresoGuardado = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
-    setProgreso({
-      cine: progresoGuardado.cine || false,
-      horario: progresoGuardado.horario || false,
-      butacas: progresoGuardado.butacas || false,
-      pago: progresoGuardado.pago || false,
-    });
+    const progresoGuardado = JSON.parse(localStorage.getItem("reservaProgreso"));
+    if (!progresoGuardado) {
+      // Si no hay progreso guardado, inicializa solo cine como true
+      localStorage.setItem(
+        "reservaProgreso",
+        JSON.stringify({
+          cine: true,
+          horario: false,
+          butacas: false,
+          pago: false,
+        })
+      );
+      setProgreso({
+        cine: true,
+        horario: false,
+        butacas: false,
+        pago: false,
+      });
+    } else {
+      const cine = progresoGuardado.cine || false;
+      const horario = cine && (progresoGuardado.horario || false);
+      const butacas = horario && (progresoGuardado.butacas || false);
+      const pago = butacas && (progresoGuardado.pago || false);
+
+      setProgreso({ cine, horario, butacas, pago });
+    }
   }, [pathname]);
 
   const steps = [
@@ -37,21 +56,21 @@ export default function Breadcrumbs() {
       href: `/reserva/${id}/horario`,
       icon: <Clock className="h-5 w-5" />,
       active: pathname.includes("/reserva/horario"),
-      disabled: !progreso.cine,
+      disabled: !progreso.horario,   
     },
     {
       name: "Butacas",
       href: `/reserva/${id}/butacas`,
       icon: <Sofa className="h-5 w-5" />,
       active: pathname.includes("/reserva/butacas"),
-      disabled: !progreso.horario,
+      disabled: !progreso.butacas,   
     },
     {
       name: "Pago",
       href: `/reserva/${id}/pago`,
       icon: <CreditCard className="h-5 w-5" />,
       active: pathname.includes("/reserva/pago"),
-      disabled: !progreso.butacas,
+      disabled: !progreso.pago,     
     },
   ];
 
@@ -63,7 +82,6 @@ export default function Breadcrumbs() {
             {index > 0 && (
               <ChevronRight className="h-4 w-4 mx-1 md:mx-2 text-muted-foreground flex-shrink-0" />
             )}
-
             <div
               className={`flex items-center ${
                 step.active
@@ -80,9 +98,14 @@ export default function Breadcrumbs() {
               >
                 {step.icon}
               </div>
-
               {step.disabled ? (
-                <span className="ml-2 select-none">{step.name}</span> 
+                <span
+                  className="ml-2 select-none"
+                  aria-disabled="true"
+                  tabIndex={-1}
+                >
+                  {step.name}
+                </span>
               ) : (
                 <Link to={step.href} className="ml-2 text-[var(--principal)]">
                   {step.name}

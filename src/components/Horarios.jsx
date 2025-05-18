@@ -15,64 +15,88 @@ export default function Horarios() {
     { id: "pasado", label: "Pasado", fecha: new Date(Date.now() + 2 * 86400000) },
   ];
 
-  const fechaSeleccionadaDate = fechas.find((f) => f.id === selectedDate)?.fecha;
-
   useEffect(() => {
     const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
-
-    localStorage.setItem("reservaProgreso", JSON.stringify({
-      ...progreso,
-      horario: true,
-      cine: progreso.cine ?? true,
-      butacas: false,
-      pago: false
-    }));
+    if (progreso.cine) {
+      localStorage.setItem(
+        "reservaProgreso",
+        JSON.stringify({
+          ...progreso,
+          horario: true,
+          butacas: false,
+          pago: false,
+        })
+      );
+    } else {
+      localStorage.setItem(
+        "reservaProgreso",
+        JSON.stringify({
+          ...progreso,
+          horario: false,
+          butacas: false,
+          pago: false,
+        })
+      );
+    }
   }, []);
+
 
   useEffect(() => {
     const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
     if (peliculaGuardada) {
       setSelectedPelicula({
-        id_pelicula: peliculaGuardada?.id_pelicula,
-        titulo: peliculaGuardada?.titulo ?? "Nombre desconocido",
+        id_pelicula: peliculaGuardada.id_pelicula,
+        titulo: peliculaGuardada.titulo ?? "Nombre desconocido",
       });
     }
   }, []);
 
   useEffect(() => {
-  if (!selectedPelicula || !selectedPelicula.id_pelicula) return;
+    if (!selectedPelicula?.id_pelicula) return;
 
-  const fetchHorarios = async () => {
-    try {
-      const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
-      const resHorarios = await fetch(`${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`);
-      const horariosData = await resHorarios.json();
+    const fetchHorarios = async () => {
+      try {
+        const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
+        const resHorarios = await fetch(`${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`);
+        const horariosData = await resHorarios.json();
 
-      // const ahora = new Date();
-      // const fechaSeleccionada = new Date(fechaSeleccionadaDate);
-      // fechaSeleccionada.setHours(0, 0, 0, 0);
+        if (!Array.isArray(horariosData)) {
+          setPeliculas([{ ...selectedPelicula, horarios: [] }]);
+          return;
+        }
 
-      // Mostrar todos los horarios sin filtrar temporalmente
-      let horariosFiltrados = [];
+        const ahora = new Date();
+        const fechaSeleccionadaObj = fechas.find((f) => f.id === selectedDate)?.fecha;
+        if (!fechaSeleccionadaObj) return;
 
-      if (Array.isArray(horariosData)) {
-        horariosFiltrados = horariosData.map((h) => ({
-          hora: h.fecha_hora.split("T")[1].slice(0, 5),
-          sala: `Sala ${h.id_sala}`,
-          id_horario: h.id_horario,
-        }));
+        const fechaInicio = new Date(fechaSeleccionadaObj);
+        fechaInicio.setHours(0, 0, 0, 0);
+
+        const horariosFiltrados = horariosData
+          .filter((h) => {
+            const fechaHora = new Date(h.fecha_hora);
+            const mismoDia =
+              fechaHora >= fechaInicio && fechaHora < new Date(fechaInicio.getTime() + 86400000);
+            if (!mismoDia) return false;
+            if (selectedDate === "hoy") {
+              return fechaHora >= ahora;
+            }
+            return true;
+          })
+          .map((h) => ({
+            hora: h.fecha_hora.split("T")[1].slice(0, 5),
+            sala: `Sala ${h.id_sala}`,
+            id_horario: h.id_horario,
+          }));
+
+        setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
+      } catch (err) {
+        console.error("Error al cargar los horarios:", err);
       }
+    };
 
-      setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
-    } catch (err) {
-      console.error("Error al cargar los horarios:", err);
-    }
-  };
-
-  fetchHorarios();
-}, [selectedPelicula, selectedDate]);
-
-
+    fetchHorarios();
+  }, [selectedPelicula, selectedDate]);
 
   const handleContinuar = () => {
     if (!selectedHorario || !selectedPelicula) {
@@ -80,7 +104,7 @@ export default function Horarios() {
       return;
     }
 
-    const horarioSeleccionadoObj = peliculas[0].horarios.find(
+    const horarioSeleccionadoObj = peliculas[0]?.horarios.find(
       (h) => h.id_horario === selectedHorario.id_horario
     );
 
@@ -91,7 +115,7 @@ export default function Horarios() {
 
     const reserva = {
       fecha: selectedDate,
-      horario: selectedHorario.hora,
+      horario: horarioSeleccionadoObj.hora,
       id_horario: horarioSeleccionadoObj.id_horario,
       sala: horarioSeleccionadoObj.sala.replace("Sala ", ""),
       pelicula: {
@@ -100,11 +124,20 @@ export default function Horarios() {
       },
     };
 
+    localStorage.setItem("horarioSeleccionado", JSON.stringify(reserva));
 
-    console.log("Reserva guardada en localStorage:", reserva);
-    localStorage.setItem("reserva", JSON.stringify(reserva));
+    const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
+    localStorage.setItem(
+      "reservaProgreso",
+      JSON.stringify({
+        ...progreso,
+        butacas: false,
+        pago: false,
+      })
+    );
+
     navigate(`/reserva/${selectedPelicula.id_pelicula}/butacas`);
-  };
+  }
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -135,8 +168,8 @@ export default function Horarios() {
                     key={horarioKey}
                     onClick={() => setSelectedHorario(horarioObj)}
                     className={`px-4 py-2 rounded border text-lg font-medium flex justify-between items-center ${selectedHorario?.id_horario === horarioObj.id_horario
-                        ? "bg-[var(--principal)] text-white"
-                        : "bg-white text-gray-700"
+                      ? "bg-[var(--principal)] text-white"
+                      : "bg-white text-gray-700"
                       }`}
                   >
                     <span>{horarioObj.hora}</span>
