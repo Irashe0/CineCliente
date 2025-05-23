@@ -11,6 +11,7 @@ export default function Butacas() {
   const [selectedButacas, setSelectedButacas] = useState(new Set());
 
   const reserva = JSON.parse(localStorage.getItem("reserva")) || {};
+  console.log("🧾 reserva:", reserva);
   const { sala, horario, pelicula, id_horario } = reserva;
 
   const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
@@ -38,6 +39,8 @@ export default function Butacas() {
   useEffect(() => {
     const fetchButacas = async () => {
       try {
+        console.log("🎯 sala:", sala, "id_horario:", id_horario);
+
         const res = await fetch(`${API_BASE}/butacas/sala/${sala}/horario/${id_horario}`);
         if (!res.ok) throw new Error("Error al obtener butacas");
         const data = await res.json();
@@ -51,6 +54,7 @@ export default function Butacas() {
 
     if (sala && id_horario) fetchButacas();
   }, [sala, id_horario]);
+
 
   const toggleSeleccionButaca = (id) => {
     setSelectedButacas((prev) => {

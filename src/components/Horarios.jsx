@@ -9,37 +9,30 @@ export default function Horarios() {
   const [peliculas, setPeliculas] = useState([]);
   const [selectedPelicula, setSelectedPelicula] = useState(null);
 
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  console.log(startOfToday)
+
   const fechas = [
-    { id: "hoy", label: "Hoy", fecha: new Date() },
-    { id: "manana", label: "Mañana", fecha: new Date(Date.now() + 86400000) },
-    { id: "pasado", label: "Pasado", fecha: new Date(Date.now() + 2 * 86400000) },
+    { id: "hoy", label: "Hoy", fecha: new Date(startOfToday) },
+    { id: "manana", label: "Mañana", fecha: new Date(startOfToday.getTime() + 86400000) },
+    { id: "pasado", label: "Pasado", fecha: new Date(startOfToday.getTime() + 2 * 86400000) },
   ];
+  console.log(fechas)
 
   useEffect(() => {
     const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
-    if (progreso.cine) {
-      localStorage.setItem(
-        "reservaProgreso",
-        JSON.stringify({
-          ...progreso,
-          horario: true,
-          butacas: false,
-          pago: false,
-        })
-      );
-    } else {
-      localStorage.setItem(
-        "reservaProgreso",
-        JSON.stringify({
-          ...progreso,
-          horario: false,
-          butacas: false,
-          pago: false,
-        })
-      );
-    }
+    localStorage.setItem(
+      "reservaProgreso",
+      JSON.stringify({
+        ...progreso,
+        horario: true,
+        butacas: false,
+        pago: false,
+      })
+    );
   }, []);
-
 
   useEffect(() => {
     const peliculaGuardada = JSON.parse(localStorage.getItem("peliculaSeleccionada"));
@@ -51,51 +44,59 @@ export default function Horarios() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!selectedPelicula?.id_pelicula) return;
+  const fetchHorarios = async () => {
+    try {
+      const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
+      const resHorarios = await fetch(
+        `${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`
+      );
+      const horariosData = await resHorarios.json();
 
-    const fetchHorarios = async () => {
-      try {
-        const API_BASE = "https://laravelcine-cine-zeocca.laravel.cloud/api";
-        const resHorarios = await fetch(`${API_BASE}/horarios/pelicula/${selectedPelicula.id_pelicula}`);
-        const horariosData = await resHorarios.json();
-
-        if (!Array.isArray(horariosData)) {
-          setPeliculas([{ ...selectedPelicula, horarios: [] }]);
-          return;
-        }
-
-        const ahora = new Date();
-        const fechaSeleccionadaObj = fechas.find((f) => f.id === selectedDate)?.fecha;
-        if (!fechaSeleccionadaObj) return;
-
-        const fechaInicio = new Date(fechaSeleccionadaObj);
-        fechaInicio.setHours(0, 0, 0, 0);
-
-        const horariosFiltrados = horariosData
-          .filter((h) => {
-            const fechaHora = new Date(h.fecha_hora);
-            const mismoDia =
-              fechaHora >= fechaInicio && fechaHora < new Date(fechaInicio.getTime() + 86400000);
-            if (!mismoDia) return false;
-            if (selectedDate === "hoy") {
-              return fechaHora >= ahora;
-            }
-            return true;
-          })
-          .map((h) => ({
-            hora: h.fecha_hora.split("T")[1].slice(0, 5),
-            sala: `Sala ${h.id_sala}`,
-            id_horario: h.id_horario,
-          }));
-
-        setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
-      } catch (err) {
-        console.error("Error al cargar los horarios:", err);
+      if (!Array.isArray(horariosData) || horariosData.length === 0) {
+        setPeliculas([{ ...selectedPelicula, horarios: [] }]);
+        return;
       }
-    };
 
-    fetchHorarios();
+      const ahora = new Date();
+      const fechaSeleccionadaObj = fechas.find((f) => f.id === selectedDate)?.fecha;
+      if (!fechaSeleccionadaObj) return;
+
+      const fechaInicio = new Date(fechaSeleccionadaObj);
+      fechaInicio.setHours(0, 0, 0, 0);
+
+      const fechaFin = new Date(fechaSeleccionadaObj);
+      if (selectedDate === "hoy") {
+        fechaFin.setDate(fechaFin.getDate() + 1); 
+        fechaFin.setHours(1, 0, 0, 0);             
+      } else {
+        fechaFin.setHours(23, 59, 59, 999);
+      }
+
+      const horariosFiltrados = horariosData
+        .filter((h) => {
+          const fechaHora = new Date(h.fecha_hora);
+          const dentroDelDia = fechaHora >= fechaInicio && fechaHora <= fechaFin;
+          const esHoyYEnElFuturo = selectedDate === "hoy" ? fechaHora > ahora : true;
+          return dentroDelDia && esHoyYEnElFuturo;
+        })
+        .map((h) => ({
+          hora: h.fecha_hora.split("T")[1].slice(0, 5),
+          sala: `Sala ${h.id_sala}`,
+          id_horario: h.id_horario,
+        }));
+
+      setPeliculas([{ ...selectedPelicula, horarios: horariosFiltrados }]);
+    } catch (error) {
+      console.error("Error al obtener los horarios:", error);
+      setPeliculas([{ ...selectedPelicula, horarios: [] }]);
+    }
+  };
+
+
+  useEffect(() => {
+    if (selectedPelicula?.id_pelicula) {
+      fetchHorarios();
+    }
   }, [selectedPelicula, selectedDate]);
 
   const handleContinuar = () => {
@@ -124,7 +125,7 @@ export default function Horarios() {
       },
     };
 
-    localStorage.setItem("horarioSeleccionado", JSON.stringify(reserva));
+    localStorage.setItem("reserva", JSON.stringify(reserva));
 
     const progreso = JSON.parse(localStorage.getItem("reservaProgreso")) || {};
     localStorage.setItem(
@@ -137,7 +138,7 @@ export default function Horarios() {
     );
 
     navigate(`/reserva/${selectedPelicula.id_pelicula}/butacas`);
-  }
+  };
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -146,7 +147,9 @@ export default function Horarios() {
           <button
             key={fecha.id}
             onClick={() => setSelectedDate(fecha.id)}
-            className={`flex flex-col items-center border rounded-lg py-2 ${selectedDate === fecha.id ? "bg-[var(--principal)] text-white" : "bg-white text-gray-700"
+            className={`flex flex-col items-center border rounded-lg py-2 ${selectedDate === fecha.id
+              ? "bg-[var(--principal)] text-white"
+              : "bg-white text-gray-700"
               }`}
           >
             <span className="font-medium">{fecha.label}</span>

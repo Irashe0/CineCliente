@@ -77,7 +77,20 @@ const Pago = () => {
         }),
       });
 
-      if (!reservaResponse.ok) throw new Error("Error al registrar la reserva.");
+      console.log("Datos enviados:", {
+        id_user: user.id,
+        id_horario: reserva.id_horario
+      });
+
+      if (!reservaResponse.ok) {
+        const errorData = await reservaResponse.json();
+        console.error("Detalles del error:", errorData);
+        throw new Error("Error al registrar la reserva.");
+      }
+
+
+
+
       const nuevaReserva = await reservaResponse.json();
 
       const numeroFactura = generarCodigo();
@@ -163,8 +176,8 @@ const Pago = () => {
     }
   };
 
-return (
-  <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
+  return (
+    <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
       <div className="w-full md:w-2/3 mb-6 md:mb-0">
         <div className="rounded-lg border border-[#3a3a3a] bg-[#14130f] text-white shadow-lg w-full">
           <div className="rounded-t-lg border-b border-[#3a3a3a] p-4">
