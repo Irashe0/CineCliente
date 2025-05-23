@@ -67,7 +67,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-3 pt-2 text-center">
           <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} CineLuxe. Todos los derechos reservados.
+            &copy; {new Date().getFullYear()} CineLuxe, Todos los derechos reservados.
           </p>
         </div>
       </div>
