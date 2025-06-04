@@ -74,7 +74,8 @@ const Header = () => {
 
   return (
     <div>
-      <header className="fixed top-0 left-0 w-full h-25 bg-gradient-to-b from-[#778899] to-transparent dark:from-black dark:to-transparent text-white shadow-[rgba(0,0,0,0.25)] z-10 flex items-center">
+<header className="fixed top-0 left-0 w-full p-2 pt-0 md:p-5 bg-gradient-to-b from-black to-transparent text-white shadow-[rgba(0,0,0,0.25)] z-10 flex items-center">
+
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link to="/">
             <img src={Logo} alt="CineLuxe" className="h-40 w-48 image-lighten" />

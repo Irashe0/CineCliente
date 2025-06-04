@@ -54,10 +54,10 @@ export default function MisEntradas() {
     return (
         <>
             <div className="relative min-h-screen flex flex-col items-center p-6">
-                <h1 className="text-6xl font-extrabold text-[#CDAA7D] tracking-wide text-center uppercase absolute top-6 w-full">
+                  <h1 className="text-6xl font-extrabold text-[#CDAA7D] tracking-wide text-center uppercase mb-10">
                     Mis Entradas
                 </h1>
-                <div className="flex flex-wrap gap-6 justify-center w-full mt-24">
+                <div className="flex flex-wrap gap-6 justify-center w-full">
                     {reservasDetalle.length === 0 ? (
                         <p className="text-center text-gray-500 w-full">No hay entradas disponibles.</p>
                     ) : (
