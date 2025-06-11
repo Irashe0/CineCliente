@@ -125,7 +125,7 @@ export default function Butacas() {
     <div className="space-y-6 px-4 py-6 sm:px-6 md:px-10 lg:px-20">
       <h2 className="text-center text-xl sm:text-2xl font-bold text-[var(--texto-primario)]">Selecciona tus butacas</h2>
       <p className="text-center text-sm text-[var(--texto-secundario)]">
-        Sala: <strong>{sala}</strong> | Horario: <strong>{horario}</strong>
+        Horario: <strong>{horario}</strong>
       </p>
 
       <div className="rounded-xl p-4 space-y-4 bg-[var(--gris-oscuro)]">

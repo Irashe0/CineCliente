@@ -54,7 +54,7 @@ export default function MisEntradas() {
     return (
         <>
             <div className="relative min-h-screen flex flex-col items-center p-6">
-                  <h1 className="text-6xl font-extrabold text-[#CDAA7D] tracking-wide text-center uppercase mb-10">
+                <h1 className="text-6xl font-extrabold text-[#CDAA7D] tracking-wide text-center uppercase mb-10">
                     Mis Entradas
                 </h1>
                 <div className="flex flex-wrap gap-6 justify-center w-full">
@@ -76,7 +76,8 @@ export default function MisEntradas() {
                                     <p className="font-semibold"><strong>Factura:</strong> {entrada.numero_factura}</p>
                                     <p className="font-semibold">
                                         <strong>Horario:</strong>{" "}
-                                        {new Date(entrada.horario).toLocaleString("es-ES", {
+                                        <strong>Horario:</strong>{" "}
+                                        {new Date(new Date(entrada.horario).getTime() - 2 * 60 * 60 * 1000).toLocaleString("es-ES", {
                                             day: "2-digit",
                                             month: "2-digit",
                                             year: "numeric",
