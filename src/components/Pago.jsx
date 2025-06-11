@@ -88,9 +88,6 @@ const Pago = () => {
         throw new Error("Error al registrar la reserva.");
       }
 
-
-
-
       const nuevaReserva = await reservaResponse.json();
 
       const numeroFactura = generarCodigo();

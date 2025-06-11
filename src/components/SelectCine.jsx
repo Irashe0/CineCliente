@@ -56,6 +56,16 @@ export default function SelectCine() {
               nombre={cine.nombre}
               ubicacion={cine.direccion}
               telefono={cine.telefono}
+              onClick={() => {
+                localStorage.setItem(
+                  "cineSeleccionado",
+                  JSON.stringify({
+                    id_cine: cine.id_cine,
+                    nombre: cine.nombre,
+                  })
+                );
+                console.log(`Cine seleccionado: ${cine.nombre} (ID: ${cine.id_cine})`);
+              }}
             />
           )
         ))}

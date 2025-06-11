@@ -1,11 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function CinesCardReserva({ id, nombre, ubicacion, telefono }) {
+export default function CinesCardReserva({ id, nombre, ubicacion, telefono, onClick }) {
   const navigate = useNavigate();
-  const { id: peliculaId } = useParams(); 
+  const { id: peliculaId } = useParams();
 
   const handleCardClick = () => {
     localStorage.setItem("cineSeleccionado", JSON.stringify({ id, nombre }));
+
+    if (onClick) onClick();
+
     navigate(`/reserva/${peliculaId}/horario`);
   };
 
